@@ -29,23 +29,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+      # - name: Lowercase the repo name and username
+      #   run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       
-      # - name: docker build
-      #   run: |
-      #     docker build --tag ghcr.io/${{ env.REPO }}:${{ github.sha }} ./src/Server1
-
-      # - name: docker push
-      #   run: |
-      #     docker push ghcr.io/${{ env.REPO }}:${{ github.sha }}
-
-      - name: Build and push container image to registry
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
-          file: ./src/Server1/Dockerfile
+      - name: docker build
+        env:
+          REPO: ${GITHUB_REPOSITORY,,}
+          DOCKER_TAG: ghcr.io/${{ env.REPO }}:${{ github.sha }}
+        run: |
+          echo REPO: ${{ env.REPO }}
+          echo DOCKER_TAG: ${{ env.DOCKER_TAG }}
+          docker build --tag ${{ env.DOCKER_TAG }} ./src/Server1
+          docker push ${{ env.DOCKER_TAG }}
 
 #  deploy:
 #    permissions:
