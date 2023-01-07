@@ -1,9 +1,9 @@
 name: Deploy
 
-env:
-  GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
-  deployment_name: 'placeholder_deployment_name'
-  image_tag_server1: 'placeholder_image_tag_server1'
+# env:
+#   GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
+#   deployment_name: 'placeholder_deployment_name'
+#   image_tag_server1: 'placeholder_image_tag_server1'
 
 on:
   push:
