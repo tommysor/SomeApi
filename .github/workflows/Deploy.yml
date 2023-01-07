@@ -39,9 +39,9 @@ jobs:
         run: |
           docker build --tag ghcr.io/${{ env.REPO }}:${{ github.sha }} ./src/Server1
 
-      - name: docker login
-        run: |
-          docker login --username ${{ github.actor }} --password ${{ github.token }} ghcr.io
+#      - name: docker login
+#        run: |
+#          docker login --username ${{ github.actor }} --password ${{ github.token }} ghcr.io
 
       - name: docker push
         run: |
