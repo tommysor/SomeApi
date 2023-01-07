@@ -50,21 +50,20 @@ jobs:
 
     - name: TEST
       run: |
-        echo pwd: $pwd
         echo pwd: $(pwd)
         echo PWD: $PWD
-        echo PWD: $(PWD)
-        echo IMG: server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
-        echo IMG: 'server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}'
+        ls -lh
 
     - name: deploy
       uses: azure/arm-deploy@v1
+      env:
+        biceptemplates: server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
       with:
         scope: resourcegroup
         # subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ secrets.AZURE_RG }}
-        template: ../build/main.bicep
+        template: ./build/main.bicep
         # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
-        parameters: 'server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}'
+        parameters: ${{ env.biceptemplates }}
         # failOnStdErr: false
         deploymentMode: Complete
