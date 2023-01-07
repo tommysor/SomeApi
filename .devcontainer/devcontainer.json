@@ -15,7 +15,9 @@
 				"ms-dotnettools.csharp",
 				"ms-azuretools.vscode-docker",
 				"GitHub.copilot",
-				"formulahendry.dotnet-test-explorer"
+				"formulahendry.dotnet-test-explorer",
+				"cschleiden.vscode-github-actions",
+				"ms-azuretools.vscode-bicep"
 			]
 		}
 	},
