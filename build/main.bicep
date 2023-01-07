@@ -1,6 +1,6 @@
 param location string = 'norwayeast'
 
-param server1ContainerImage string = 'ghcr.io/tommysor/someapi/server1:c552b78884c9c584819c06bd42c9a7b791e7282b'
+param server1ContainerImage string = 'ghcr.io/tommysor/someapi/server1'
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: 'containerAppLogAnalyticsName'
@@ -34,7 +34,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 }
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
-  name: 'containerappserver1'
+  name: 'server1'
   location: location
   properties: {
     managedEnvironmentId: containerAppEnv.id
