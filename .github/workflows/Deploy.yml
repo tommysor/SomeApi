@@ -1,8 +1,5 @@
 name: Deploy
 
-env:
-  GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
-
 on:
   push:
     branches: [ "main" ]
@@ -12,12 +9,12 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
-#permissions:
-#  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-22.04
+
+    env:
+      GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
 
     steps:
       - uses: actions/checkout@v3
