@@ -54,7 +54,7 @@ jobs:
         scope: resourcegroup
         # subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ secrets.AZURE_RG }}
-        template: build/main.bicep
+        template: ../build/main.bicep
         # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
         parameters: 'server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}'
         # failOnStdErr: false
