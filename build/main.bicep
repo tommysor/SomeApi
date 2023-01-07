@@ -54,7 +54,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       maxInactiveRevisions: 2
       dapr: {
         enabled: false
-        appId: 'containerAppServer1'
+        appId: 'server1'
         appPort: 80
         appProtocol: 'http'
         enableApiLogging: true
