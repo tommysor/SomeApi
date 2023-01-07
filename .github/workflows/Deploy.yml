@@ -1,7 +1,9 @@
 name: Deploy
 
 env:
-  GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
+  GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
+  deployment_name: 'placeholder_deployment_name'
+  image_tag_server1: 'placeholder_image_tag_server1'
 
 on:
   push:
@@ -19,6 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Build Docker image name
+        run: |
+          echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+          echo "deployment_name=${{ env.GITHUB_REPOSITORY_LOWERCASE }}-${{ github.sha }}"
+          echo "image_tag_server1=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}"
+
       - name: Log in to GitHub container registry
         uses: docker/login-action@v2
         with:
@@ -27,12 +35,10 @@ jobs:
           password: ${{ github.token }}
       
       - name: Docker build and push
-        env:
-          image_tag: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
         run: |
-          echo image_tag: ${{ env.image_tag }}
-          docker build --tag ${{ env.image_tag }} ./src/Server1
-          docker push ${{ env.image_tag }}
+          echo image_tag: ${{ env.image_tag_server1 }}
+          docker build --tag ${{ env.image_tag_server1 }} ./src/Server1
+          docker push ${{ env.image_tag_server1 }}
 
   deploy:
     # permissions:
@@ -65,4 +71,4 @@ jobs:
         # parameters: ${{ env.biceptemplates }}
         # failOnStdErr: false
         deploymentMode: Complete
-        deploymentName: ${{ env.GITHUB_REPOSITORY_LOWERCASE }}-${{ github.sha }}
+        deploymentName: ${{ env.deployment_name }}
