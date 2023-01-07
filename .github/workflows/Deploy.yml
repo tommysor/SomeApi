@@ -1,5 +1,8 @@
 name: Deploy
 
+env:
+  GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
+
 on:
   push:
     branches: [ "main" ]
@@ -12,9 +15,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-22.04
-
-    env:
-      GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
 
     steps:
       - uses: actions/checkout@v3
@@ -34,13 +34,28 @@ jobs:
           docker build --tag ${{ env.image_tag }} ./src/Server1
           docker push ${{ env.image_tag }}
 
-#  deploy:
-#    permissions:
-#      contents: none
-#    runs-on: ubuntu-latest
-#    needs: build
-#    environment:
-#      name: 'Development'
-#      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+  deploy:
+    # permissions:
+    #   contents: none
+    runs-on: ubuntu-22.04
+    needs: build
+    environment: Production
+      # name: 'Production'
+      # url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-#    steps:
+    steps:
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
+
+    - name: deploy
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        # subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ secrets.AZURE_RG }}
+        template: ./build/main.bicep
+        # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
+        parameters: 'server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}'
+        # failOnStdErr: false
+        deploymentMode: Complete

@@ -1,19 +1,27 @@
 param location string = 'norwayeast'
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+param server1ContainerImage string = 'ghcr.io/tommysor/someapi/server1:c552b78884c9c584819c06bd42c9a7b791e7282b'
+
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: 'containerAppLogAnalyticsName'
   location: location
   properties: {
     sku: {
       name: 'PerGB2018'
     }
+    retentionInDays: 30
+    workspaceCapping: {
+      dailyQuotaGb: 1
+    }
   }
 }
 
-resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
+resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
   name: 'containerAppEnvName'
   location: location
-  
+  sku: {
+    name: 'Consumption'
+  }
   properties: {
     appLogsConfiguration: {
       destination: 'log-analytics'
@@ -25,72 +33,63 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
   }
 }
 
-// resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
-//   name: containerAppName
-//   location: location
-//   properties: {
-//     managedEnvironmentId: containerAppEnv.id
-//     configuration: {
-//       ingress: {
-//         external: true
-//         targetPort: 80
-//         allowInsecure: false
-//         traffic: [
-//           {
-//             latestRevision: true
-//             weight: 100
-//           }
-//         ]
-//       }
-//     }
-//     template: {
-//       revisionSuffix: 'firstrevision'
-//       containers: [
-//         {
-//           name: containerAppName
-//           image: frontendContainerImage
-//           env: [
-//             {
-//               name: 'REDIS'
-//               value: 'localhost'
-//             }
-//           ]
-//           resources: {
-//             cpu: json('.25')
-//             memory: '.5Gi'
-//           }
-//         }
-//         {
-//           name: 'redis'
-//           image: backendContainerImage
-//           env: [
-//             {
-//               name: 'ALLOW_EMPTY_PASSWORD'
-//               value: 'yes'
-//             }
-//           ]
-//           resources: {
-//             cpu: json('.25')
-//             memory: '.5Gi'
-//           }
-//         }
-//       ]
-//       scale: {
-//         minReplicas: 0
-//         maxReplicas: 1
-//         rules: [
-//           {
-//             name: 'http-requests'
-//             http: {
-//               metadata: {
-//                 concurrentRequests: '10'
-//               }
-//             }
-//           }
-//         ]
-//       }
-//     }
-//   }
-// }
+resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
+  name: 'containerAppServer1'
+  location: location
+  properties: {
+    managedEnvironmentId: containerAppEnv.id
+    configuration: {
+      ingress: {
+        external: true
+        targetPort: 80
+        allowInsecure: false
+        traffic: [
+          {
+            latestRevision: true
+            weight: 100
+          }
+        ]
+      }
+      activeRevisionsMode: 'Multiple'
+      maxInactiveRevisions: 2
+      dapr: {
+        enabled: false
+        appId: 'containerAppServer1'
+        appPort: 80
+        appProtocol: 'http'
+        enableApiLogging: true
+        logLevel: 'info'
+      }
+    }
+    template: {
+      revisionSuffix: 'firstrevision'
+      containers: [
+        {
+          name: 'server1'
+          image: server1ContainerImage
+          
+          resources: {
+            cpu: json('.25')
+            memory: '.5Gi'
+          }
+        }
+      ]
+      scale: {
+        minReplicas: 0
+        maxReplicas: 1
+        rules: [
+          {
+            name: 'http-requests'
+            http: {
+              metadata: {
+                concurrentRequests: '10'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
 
-// output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
