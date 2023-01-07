@@ -1,7 +1,7 @@
 name: Deploy
 
 env:
-  AZURE_WEBAPP_NAME: your-app-name  # set this to the name of your Azure Web App
+  GITHUB_REPOSITORY_LOWERCASE: ${GITHUB_REPOSITORY,,}
 
 on:
   push:
@@ -28,19 +28,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-
-      # - name: Lowercase the repo name and username
-      #   run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       
       - name: docker build
         env:
-          REPO: ${GITHUB_REPOSITORY,,}
-          DOCKER_TAG: ghcr.io/${{ env.REPO }}:${{ github.sha }}
+          image_tag: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
         run: |
-          echo REPO: ${{ env.REPO }}
-          echo DOCKER_TAG: ${{ env.DOCKER_TAG }}
-          docker build --tag ${{ env.DOCKER_TAG }} ./src/Server1
-          docker push ${{ env.DOCKER_TAG }}
+          echo image_tag: ${{ env.image_tag }}
+          docker build --tag ${{ env.image_tag }} ./src/Server1
+          docker push ${{ env.image_tag }}
 
 #  deploy:
 #    permissions:
