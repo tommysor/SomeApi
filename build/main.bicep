@@ -34,7 +34,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 }
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
-  name: 'containerAppServer1'
+  name: 'containerappserver1'
   location: location
   properties: {
     managedEnvironmentId: containerAppEnv.id
