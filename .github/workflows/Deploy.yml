@@ -48,6 +48,15 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
+    - name: TEST
+      run: |
+        echo pwd: $pwd
+        echo pwd: $(pwd)
+        echo PWD: $PWD
+        echo PWD: $(PWD)
+        echo IMG: server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
+        echo IMG: 'server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}'
+
     - name: deploy
       uses: azure/arm-deploy@v1
       with:
