@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param containerAppEnvName string
+param containerAppEnvName string = 'containerAppEnvName'
 param server1ContainerImage string
 param server1RevisionSuffix string
 
