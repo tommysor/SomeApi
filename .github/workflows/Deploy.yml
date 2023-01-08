@@ -70,12 +70,6 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
-    - name: TEST
-      run: |
-        echo server1ContainerImage
-        echo 'server1ContainerImage=${{ env.image_tag_server1 }}'
-        echo ${{ env.image_tag_server1 }}
-
     - name: deploy
       uses: azure/arm-deploy@v1
       with:
