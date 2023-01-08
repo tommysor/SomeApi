@@ -47,16 +47,13 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
           }
           probes: [
             {
-              type: 'Liveness'
-              httpGet: {
-                path: '/health'
+              type: 'Startup'
+              initialDelaySeconds: 5
+              periodSeconds: 1
+              failureThreshold: 10
+              tcpSocket: {
                 port: 80
               }
-              initialDelaySeconds: 10
-              periodSeconds: 10
-              timeoutSeconds: 1
-              failureThreshold: 3
-              successThreshold: 1
             }
             {
               type: 'Readiness'
@@ -70,22 +67,24 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
               failureThreshold: 9
               successThreshold: 1
             }
+            {
+              type: 'Liveness'
+              httpGet: {
+                path: '/health'
+                port: 80
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              failureThreshold: 3
+              successThreshold: 1
+            }
           ]
         }
       ]
       scale: {
-        minReplicas: 0
+        minReplicas: 1
         maxReplicas: 1
-        rules: [
-          {
-            name: 'http-requests'
-            http: {
-              metadata: {
-                concurrentRequests: '10'
-              }
-            }
-          }
-        ]
       }
     }
   }
