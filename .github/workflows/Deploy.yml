@@ -25,7 +25,7 @@ jobs:
         run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Deployment name
-        run: echo "deployment_name=${{ env.GITHUB_REPOSITORY_LOWERCASE }}-${{ github.sha }}" >>${GITHUB_ENV}
+        run: echo "deployment_name=${{ github.sha }}" >>${GITHUB_ENV}
       
       - name: Image tag name
         run: echo "image_tag_server1=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}" >>${GITHUB_ENV}
@@ -63,15 +63,13 @@ jobs:
 
     - name: deploy
       uses: azure/arm-deploy@v1
-      # env:
-      #   biceptemplates: server1ContainerImage=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
       with:
         scope: resourcegroup
         # subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./build/main.bicep
         # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
-        # parameters: ${{ env.biceptemplates }}
+        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }}'
         # failOnStdErr: false
         deploymentMode: Complete
         deploymentName: ${{ env.deployment_name }}

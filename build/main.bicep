@@ -1,6 +1,6 @@
 param location string = 'norwayeast'
 
-param server1ContainerImage string = 'ghcr.io/tommysor/someapi/server1:c9a56e97eeeefb674eb528220f464ab4bfcccda2'
+param server1ContainerImage string
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: 'containerAppLogAnalyticsName'
