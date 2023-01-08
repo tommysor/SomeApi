@@ -1,6 +1,6 @@
 param location string = 'norwayeast'
-
 param server1ContainerImage string
+param revisionSuffix string
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: 'containerAppLogAnalyticsName'
@@ -62,7 +62,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       }
     }
     template: {
-      revisionSuffix: 'firstrevision'
+      revisionSuffix: revisionSuffix
       containers: [
         {
           name: 'server1'

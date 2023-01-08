@@ -84,7 +84,7 @@ jobs:
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./build/main.bicep
         # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
-        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }}'
+        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }} revisionSuffix=${{ github.sha }}'
         # failOnStdErr: false
         deploymentMode: Complete
         deploymentName: ${{ env.deployment_name }}
