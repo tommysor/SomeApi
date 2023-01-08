@@ -2,7 +2,6 @@ name: Deploy
 
 # env:
 #   GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
-#   deployment_name: 'placeholder_deployment_name'
 #   image_tag_server1: 'placeholder_image_tag_server1'
 
 on:
@@ -23,9 +22,6 @@ jobs:
 
       - name: Repo to lowercase
         run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
-      - name: Deployment name
-        run: echo "deployment_name=${{ github.sha }}" >>${GITHUB_ENV}
       
       - name: Image tag name
         run: echo "image_tag_server1=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}" >>${GITHUB_ENV}
@@ -59,9 +55,6 @@ jobs:
 
     - name: Repo to lowercase
       run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
-    - name: Deployment name
-      run: echo "deployment_name=${{ github.sha }}" >>${GITHUB_ENV}
     
     - name: Image tag name
       run: echo "image_tag_server1=ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}" >>${GITHUB_ENV}
@@ -74,11 +67,8 @@ jobs:
       uses: azure/arm-deploy@v1
       with:
         scope: resourcegroup
-        # subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./build/main.bicep
-        # parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
-        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }} revisionSuffix=${{ github.sha }}'
-        # failOnStdErr: false
+        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }} server1RevisionSuffix=${{ github.sha }}'
         deploymentMode: Complete
-        deploymentName: ${{ env.deployment_name }}
+        deploymentName: ${{ github.sha }}
