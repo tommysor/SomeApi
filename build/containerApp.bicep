@@ -9,10 +9,16 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   location: location
   identity: {
     type: 'SystemAssigned'
-  }
+  }  
   properties: {
     environmentId: environmentId
     configuration: {
+      secrets: [
+        {
+          name: 'a'
+          value: 'a_dummy'
+        }
+      ]
       ingress: {
         external: true
         targetPort: 80
