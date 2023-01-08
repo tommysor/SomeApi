@@ -15,8 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  hackenv:
+  setenv:
     runs-on: ubuntu-22.04
+
     steps:
     - name: Repo to lowercase
       run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
@@ -29,6 +30,7 @@ jobs:
 
   build:
     runs-on: ubuntu-22.04
+    needs: setenv
 
     steps:
       - uses: actions/checkout@v3
