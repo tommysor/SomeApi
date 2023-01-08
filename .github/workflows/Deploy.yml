@@ -1,8 +1,8 @@
 name: Deploy
 
-# env:
-#   GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
-#   image_tag_server1: 'placeholder_image_tag_server1'
+env:
+  GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
+  image_tag_server1: 'placeholder_image_tag_server1'
 
 on:
   push:
@@ -63,8 +63,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
-    - name: deploy
-      uses: azure/arm-deploy@v1
+    - uses: azure/arm-deploy@v1
       with:
         scope: resourcegroup
         resourceGroupName: ${{ secrets.AZURE_RG }}
