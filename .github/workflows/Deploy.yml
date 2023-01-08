@@ -40,13 +40,9 @@ jobs:
           docker push ${{ env.image_tag_server1 }}
 
   deploy:
-    # permissions:
-    #   contents: none
     runs-on: ubuntu-22.04
     needs: build
     environment: Production
-      # name: 'Production'
-      # url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
     - uses: actions/checkout@v3
