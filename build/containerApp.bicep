@@ -13,12 +13,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   properties: {
     environmentId: environmentId
     configuration: {
-      secrets: [
-        {
-          name: 'a'
-          value: 'a_dummy'
-        }
-      ]
       ingress: {
         external: true
         targetPort: 80
@@ -52,12 +46,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             cpu: json('.25')
             memory: '.5Gi'
           }
-          env: [
-            {
-              name: 'a_local'
-              secretRef: 'a'
-            }
-          ]
         }
       ]
       scale: {
