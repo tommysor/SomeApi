@@ -41,11 +41,36 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
         {
           name: name
           image: containerImage
-          
           resources: {
             cpu: json('.25')
             memory: '.5Gi'
           }
+          probes: [
+            {
+              type: 'Liveness'
+              httpGet: {
+                path: '/health'
+                port: 80
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              failureThreshold: 3
+              successThreshold: 1
+            }
+            {
+              type: 'Readiness'
+              httpGet: {
+                path: '/WeatherForecast'
+                port: 80
+              }
+              initialDelaySeconds: 3
+              periodSeconds: 3
+              timeoutSeconds: 1
+              failureThreshold: 9
+              successThreshold: 1
+            }
+          ]
         }
       ]
       scale: {
