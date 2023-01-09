@@ -12,15 +12,23 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly Random _random;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {
         _logger = logger;
+        _random = new Random();
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
+        var rndNum = _random.Next(0, 2);
+        if (rndNum == 0)
+        {
+            throw new InvalidOperationException("Random exception");
+        }
+        
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
