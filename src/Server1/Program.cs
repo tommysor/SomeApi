@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +9,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck("randomFail", 
+        () => new Random().Next(0, 4) == 0 
+        ? HealthCheckResult.Unhealthy("random") 
+        : HealthCheckResult.Healthy("random"));
 
 var app = builder.Build();
 
