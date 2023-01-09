@@ -48,15 +48,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
           probes: [
             {
               type: 'Startup'
-              initialDelaySeconds: 5
-              periodSeconds: 1
-              failureThreshold: 10
-              tcpSocket: {
-                port: 80
-              }
-            }
-            {
-              type: 'Readiness'
               httpGet: {
                 path: '/WeatherForecast'
                 port: 80

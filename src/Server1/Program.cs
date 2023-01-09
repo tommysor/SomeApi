@@ -10,10 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks()
-    .AddCheck("randomFail", 
-        () => new Random().Next(0, 4) == 0 
-        ? HealthCheckResult.Unhealthy("random") 
-        : HealthCheckResult.Healthy("random"));
+    .AddCheck("Hello", () => HealthCheckResult.Healthy("World"));
 
 var app = builder.Build();
 
