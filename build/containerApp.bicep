@@ -64,7 +64,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
                 path: '/WeatherForecast'
                 port: 80
               }
-              initialDelaySeconds: 240
+              initialDelaySeconds: 60
               periodSeconds: 240
               timeoutSeconds: 1
               failureThreshold: 9
