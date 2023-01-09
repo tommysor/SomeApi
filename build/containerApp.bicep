@@ -59,6 +59,18 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
               successThreshold: 1
             }
             {
+              type: 'Readiness'
+              httpGet: {
+                path: '/WeatherForecast'
+                port: 80
+              }
+              initialDelaySeconds: 240
+              periodSeconds: 240
+              timeoutSeconds: 1
+              failureThreshold: 9
+              successThreshold: 1
+            }
+            {
               type: 'Liveness'
               httpGet: {
                 path: '/health'
