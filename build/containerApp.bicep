@@ -3,6 +3,7 @@ param environmentId string
 param name string
 param containerImage string
 param revisionSuffix string
+param ingressExternal bool
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: name
@@ -14,7 +15,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
     environmentId: environmentId
     configuration: {
       ingress: {
-        external: true
+        external: ingressExternal
         targetPort: 80
         allowInsecure: false
         traffic: [

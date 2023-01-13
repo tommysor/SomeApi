@@ -1,7 +1,8 @@
 param location string = resourceGroup().location
 param containerAppEnvName string = 'containerAppEnvName'
+param containerImageRevisionSuffix string
 param server1ContainerImage string
-param server1RevisionSuffix string
+param server2ContainerImage string
 
 module environment 'environment.bicep' = {
   name: 'containerAppEnv'
@@ -19,7 +20,20 @@ module server1 'containerApp.bicep' = {
     environmentId: environment.outputs.containerAppEnvId
     name: 'server1'
     containerImage: server1ContainerImage
-    revisionSuffix: server1RevisionSuffix
+    revisionSuffix: containerImageRevisionSuffix
+    ingressExternal: true
+  }
+}
+
+module server2 'containerApp.bicep' = {
+  name: 'server2'
+  params: {
+    location: location
+    environmentId: environment.outputs.containerAppEnvId
+    name: 'server2'
+    containerImage: server2ContainerImage
+    revisionSuffix: containerImageRevisionSuffix
+    ingressExternal: false
   }
 }
 

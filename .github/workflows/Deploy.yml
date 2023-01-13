@@ -33,11 +33,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
       
-      - name: Docker build and push
+      - name: Docker Server1
         run: |
           echo image_tag: ${{ env.image_tag_server1 }}
           docker build --tag ${{ env.image_tag_server1 }} ./src/Server1
           docker push ${{ env.image_tag_server1 }}
+
+      - name: Docker Server2
+        env:
+          image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
+        run: |
+          echo image_tag: ${{ env.image_tag_server2 }}
+          docker build --tag ${{ env.image_tag_server2 }} ./src/Server2
+          docker push ${{ env.image_tag_server2 }}
 
   deploy:
     runs-on: ubuntu-22.04
@@ -60,10 +68,12 @@ jobs:
         creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
     - uses: azure/arm-deploy@v1
+      env:
+        image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
       with:
         scope: resourcegroup
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./build/main.bicep
-        parameters: 'server1ContainerImage=${{ env.image_tag_server1 }} server1RevisionSuffix=${{ github.sha }}'
+        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }}'
         deploymentMode: Complete
         deploymentName: ${{ github.sha }}
