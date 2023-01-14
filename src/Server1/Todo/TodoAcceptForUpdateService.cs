@@ -11,16 +11,34 @@ public class TodoAcceptForUpdateService
 
     public async Task Create(TodoCreateDto item)
     {
-        await _httpClient.PostAsJsonAsync("", item);
+        var message = new 
+        {
+            Operation = "Create",
+            Id = Guid.Empty,
+            Body = item
+        };
+        await _httpClient.PostAsJsonAsync("", message);
     }
 
     public async Task Update(Guid id, TodoUpdateDto item)
     {
-        await _httpClient.PutAsJsonAsync($"{id}", item);
+        var message = new 
+        {
+            Operation = "Update",
+            Id = id,
+            Body = item
+        };
+        await _httpClient.PostAsJsonAsync("", message);
     }
 
     public async Task Delete(Guid id)
     {
-        await _httpClient.DeleteAsync($"{id}");
+        var message = new 
+        {
+            Operation = "Delete",
+            Id = id,
+            Body = new{}
+        };
+        await _httpClient.PostAsJsonAsync("", message);
     }
 }

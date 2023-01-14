@@ -40,6 +40,9 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   identity: {
     type: 'SystemAssigned'
   }
+  // resource sendUpdateRequestQueue 'queues@2022-01-01-preview' = {
+  //   name: 'send-update-request'
+  // }
 }
 
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
