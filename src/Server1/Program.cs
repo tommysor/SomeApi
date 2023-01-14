@@ -34,12 +34,12 @@ builder.Services.AddTransient<TableClient>(services =>
 {
     var configuration = services.GetRequiredService<IConfiguration>();
     var tableEndpoint = configuration["tableEndpoint"]!;
+    var tableName = configuration["tableName"]!;
     var logger = services.GetRequiredService<ILogger<TableClient>>();
     logger.LogInformation("Table endpoint: {tableEndpoint}", tableEndpoint);
+    logger.LogInformation("Table name: {tableName}", tableName);
 
-    var tableName = "TodoView";
     var tableClient = new TableClient(new Uri(tableEndpoint), tableName, new DefaultAzureCredential());
-    tableClient.CreateIfNotExists();
     return tableClient;
 });
 

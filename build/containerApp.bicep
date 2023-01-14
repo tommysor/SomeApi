@@ -6,6 +6,7 @@ param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
 param storageQueueName string
+param tableName string
 
 @description('Array of objects with properties name and value')
 param environmentVariables array = []
@@ -30,7 +31,9 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   resource table 'tableServices@2022-09-01' = {
     name: 'default'
-    //todo create table and remove access to create
+    resource table 'tables@2022-09-01' = {
+      name: tableName
+    }
   }
   resource queue 'queueServices@2022-09-01' = {
     name: 'default'
@@ -44,6 +47,10 @@ var environmentVariablesStore = [
   {
     name: 'tableEndpoint'
     value: storage.properties.primaryEndpoints.table
+  }
+  {
+    name: 'tableName'
+    value: tableName
   }
   {
     name: 'queueEndpoint'
@@ -143,12 +150,23 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   }
 }
 
-// Storage Table Data Contributor: /providers/Microsoft.Authorization/roleDefinitions/0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3
-resource tableDataContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
   properties: {
     principalType: 'ServicePrincipal'
+    // Storage Table Data Contributor
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
+    principalId: containerApp.identity.principalId
+  }
+  scope: storage
+}
+
+resource queueContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
+  properties: {
+    principalType: 'ServicePrincipal'
+    // Storage Queue Data Contributor
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '974c5e8b-45b9-4653-ba55-5f855dd0fb88')
     principalId: containerApp.identity.principalId
   }
   scope: storage

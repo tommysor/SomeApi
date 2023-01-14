@@ -24,6 +24,7 @@ module server1 'containerApp.bicep' = {
     ingressExternal: true
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
     storageQueueName: 'view-queue'
+    tableName: 'TodoView2'
   }
 }
 
@@ -38,6 +39,7 @@ module server2 'containerApp.bicep' = {
     ingressExternal: false
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
     storageQueueName: 'update-queue'
+    tableName: 'Todos'
   }
 }
 
