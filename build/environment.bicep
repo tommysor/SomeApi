@@ -59,7 +59,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
     daprAIConnectionString: applicationInsights.properties.ConnectionString
   }
   resource serviceBusPubSub 'daprComponents@2022-06-01-preview' = {
-    name: 'serviceBusPubSub'
+    name: 'servicebus-pub-sub'
     properties: {
       componentType: 'pubsub.azure.servicebus'
       version: 'v1'
