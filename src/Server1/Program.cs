@@ -1,4 +1,5 @@
 using Azure.Data.Tables;
+using Azure.Identity;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Server1;
@@ -22,21 +23,22 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddTransient<TodoAcceptForUpdateService>();
 builder.Services.AddTransient<TodoGetFromViewService>();
 
-builder.Services.AddHttpClient<TodoAcceptForUpdateService>(client =>
+builder.Services.AddHttpClient<TodoAcceptForUpdateService>((services, client) =>
 {
-    client.BaseAddress = new Uri("http://localhost:3500/v1.0/invoke/Server2/method/Todo");
+    var configuration = services.GetRequiredService<IConfiguration>();
+    var endpoint = configuration["SaveChangeEndpoint"]!;
+    client.BaseAddress = new Uri(endpoint);
 });
 
 builder.Services.AddTransient<TableClient>(services =>
 {
     var configuration = services.GetRequiredService<IConfiguration>();
-    var tableEndpoint = configuration["env1"];
+    var tableEndpoint = configuration["tableEndpoint"]!;
     var logger = services.GetRequiredService<ILogger<TableClient>>();
     logger.LogInformation("Table endpoint: {tableEndpoint}", tableEndpoint);
 
-    var connectionString = "DefaultEndpointsProtocol=https;AccountName=storage1qy2refqyi3cd4;AccountKey=T2GoXTm2Ah7DS8m0ISjBpqgwhKTCsH1fADetKDMhyQC8x0QufDnpJyutXsnmwoRp2PeOcR3IgdOF+AStMp1cqg==;EndpointSuffix=core.windows.net";
     var tableName = "TodoView";
-    var tableClient = new TableClient(connectionString, tableName);
+    var tableClient = new TableClient(new Uri(tableEndpoint), tableName, new DefaultAzureCredential());
     tableClient.CreateIfNotExists();
     return tableClient;
 });
@@ -53,8 +55,5 @@ var app = builder.Build();
 app.UseHealthChecks("/health");
 
 app.MapControllers();
-
-// Something to do with Dapr Actors?
-app.MapGet("/dapr/config", () => new {});
 
 app.Run();

@@ -45,55 +45,5 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
   }
 }
 
-resource storage1 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage1${uniqueString(guid(resourceGroup().id))}'
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    accessTier: 'Hot'
-    supportsHttpsTrafficOnly: true
-  }
-  resource table 'tableServices@2022-09-01' = {
-    name: 'default'
-  }
-  resource queue 'queueServices@2022-09-01' = {
-    name: 'default'
-    resource viewQueue 'queues@2022-09-01' = {
-      name: 'view-queue'
-    }
-  }
-}
-
-resource storage2 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage2${uniqueString(guid(resourceGroup().id))}'
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    accessTier: 'Hot'
-    supportsHttpsTrafficOnly: true
-  }
-  resource table 'tableServices@2022-09-01' = {
-    name: 'default'
-  }
-  resource queue 'queueServices@2022-09-01' = {
-    name: 'default'
-    resource updateQueue 'queues@2022-09-01' = {
-      name: 'update-queue'
-    }
-  }
-}
-
 output containerAppEnvId string = containerAppEnv.id
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
-
-output storage1TableEndpoint string = storage1.properties.primaryEndpoints.table
-output storage1QueueEndpoint string = storage1.properties.primaryEndpoints.queue
-
-output storage2TableEndpoint string = storage2.properties.primaryEndpoints.table
-output storage2QueueEndpoint string = storage2.properties.primaryEndpoints.queue

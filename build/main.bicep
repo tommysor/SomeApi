@@ -23,8 +23,7 @@ module server1 'containerApp.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: true
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    env1: environment.outputs.storage1TableEndpoint
-    env2: environment.outputs.storage1QueueEndpoint
+    storageQueueName: 'view-queue'
   }
 }
 
@@ -38,8 +37,7 @@ module server2 'containerApp.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: false
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    env1: environment.outputs.storage2TableEndpoint
-    env2: environment.outputs.storage2QueueEndpoint
+    storageQueueName: 'update-queue'
   }
 }
 

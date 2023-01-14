@@ -5,10 +5,53 @@ param containerImage string
 param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
+param storageQueueName string
 
-// Replace with list of arbitrary environment variables?
-param env1 string
-param env2 string
+@description('Array of objects with properties name and value')
+param environmentVariables array = []
+
+var environmentVariablesInternal = [
+  {
+    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+    value: applicationInsightsConnectionString
+  }
+]
+
+resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: '${name}storage${uniqueString(guid(resourceGroup().id))}'
+  location: location
+  kind: 'StorageV2'
+  sku: {
+    name: 'Standard_LRS'
+  }
+  properties: {
+    accessTier: 'Hot'
+    supportsHttpsTrafficOnly: true
+  }
+  resource table 'tableServices@2022-09-01' = {
+    name: 'default'
+    //todo create table and remove access to create
+  }
+  resource queue 'queueServices@2022-09-01' = {
+    name: 'default'
+    resource queue 'queues@2022-09-01' = {
+      name: storageQueueName
+    }
+  }
+}
+
+var environmentVariablesStore = [
+  {
+    name: 'tableEndpoint'
+    value: storage.properties.primaryEndpoints.table
+  }
+  {
+    name: 'queueEndpoint'
+    value: storage.properties.primaryEndpoints.queue
+  }
+]
+
+var environmentVariablesUnion = union(environmentVariablesInternal, environmentVariablesStore, environmentVariables)
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: name
@@ -51,20 +94,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             cpu: json('.25')
             memory: '.5Gi'
           }
-          env: [
-            {
-              name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-              value: applicationInsightsConnectionString
-            }
-            {
-              name: 'env1'
-              value: env1
-            }
-            {
-              name: 'env2'
-              value: env2
-            }
-          ]
+          env: environmentVariablesUnion
           probes: [
             {
               type: 'Startup'
@@ -112,5 +142,16 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
     }
   }
 }
+
+// Storage Table Data Contributor: /providers/Microsoft.Authorization/roleDefinitions/0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3
+// resource tableDataContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
+//   properties: {
+//     principalType: 'ServicePrincipal'
+//     roleDefinitionId: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+//     principalId: containerApp.identity.principalId
+//   }
+//   scope: storage
+// }
 
 output ingressFqdn string = containerApp.properties.configuration.ingress.fqdn
