@@ -50,7 +50,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             {
               type: 'Startup'
               httpGet: {
-                path: '/WeatherForecast'
+                path: '/Readiness'
                 port: 80
               }
               initialDelaySeconds: 10
@@ -62,7 +62,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             {
               type: 'Readiness'
               httpGet: {
-                path: '/WeatherForecast'
+                path: '/Readiness'
                 port: 80
               }
               initialDelaySeconds: 60
