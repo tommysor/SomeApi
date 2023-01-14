@@ -46,7 +46,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 }
 
 resource storage1 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage1_${guid(resourceGroup().id)}' 
+  name: 'storage1${guid(resourceGroup().id)}' 
   location: location
   kind: 'StorageV2'
   sku: {
@@ -68,7 +68,7 @@ resource storage1 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 }
 
 resource storage2 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage2_${guid(resourceGroup().id)}'
+  name: 'storage2${guid(resourceGroup().id)}'
   location: location
   kind: 'StorageV2'
   sku: {
