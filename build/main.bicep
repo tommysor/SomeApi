@@ -22,6 +22,7 @@ module server1 'containerApp.bicep' = {
     containerImage: server1ContainerImage
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: true
+    applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
   }
 }
 
@@ -34,6 +35,7 @@ module server2 'containerApp.bicep' = {
     containerImage: server2ContainerImage
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: false
+    applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
   }
 }
 

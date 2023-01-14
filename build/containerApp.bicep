@@ -4,6 +4,7 @@ param name string
 param containerImage string
 param revisionSuffix string
 param ingressExternal bool
+param applicationInsightsConnectionString string
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: name
@@ -46,6 +47,12 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             cpu: json('.25')
             memory: '.5Gi'
           }
+          env: [
+            {
+              name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+              value: applicationInsightsConnectionString
+            }
+          ]
           probes: [
             {
               type: 'Startup'

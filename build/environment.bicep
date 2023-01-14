@@ -45,4 +45,55 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
   }
 }
 
+resource storage1 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: 'storage1'
+  location: location
+  kind: 'StorageV2'
+  sku: {
+    name: 'Standard_LRS'
+  }
+  properties: {
+    accessTier: 'Hot'
+    supportsHttpsTrafficOnly: true
+  }
+  resource table 'tableServices@2022-09-01' = {
+    name: 'default'
+  }
+  resource queue 'queueServices@2022-09-01' = {
+    name: 'default'
+    resource viewQueue 'queues@2022-09-01' = {
+      name: 'viewQueue'
+    }
+  }
+}
+
+resource storage2 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: 'storage2'
+  location: location
+  kind: 'StorageV2'
+  sku: {
+    name: 'Standard_LRS'
+  }
+  properties: {
+    accessTier: 'Hot'
+    supportsHttpsTrafficOnly: true
+  }
+  resource table 'tableServices@2022-09-01' = {
+    name: 'default'
+  }
+  resource queue 'queueServices@2022-09-01' = {
+    name: 'default'
+    resource updateQueue 'queues@2022-09-01' = {
+      name: 'updateQueue'
+    }
+  }
+}
+
 output containerAppEnvId string = containerAppEnv.id
+output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
+
+output storage1ConnectionString string = storage1.properties.primaryEndpoints.table
+output storage1QueueConnectionString string = storage1.properties.primaryEndpoints.queue
+
+output storage2ConnectionString string = storage2.properties.primaryEndpoints.table
+output storage2QueueConnectionString string = storage2.properties.primaryEndpoints.queue

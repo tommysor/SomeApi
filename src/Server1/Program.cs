@@ -18,7 +18,7 @@ builder.Services.AddHealthChecks()
 builder.Services.AddSingleton<ITelemetryInitializer>(new Server1TelemetryInitializer("Server1"));
 builder.Services.AddApplicationInsightsTelemetry(options => 
 {
-    options.ConnectionString = "InstrumentationKey=e0366b75-cc68-4e00-b245-5a576f4bddf9;IngestionEndpoint=https://norwayeast-0.in.applicationinsights.azure.com/;LiveEndpoint=https://norwayeast.livediagnostics.monitor.azure.com/";
+    // options.ConnectionString = "InstrumentationKey=e0366b75-cc68-4e00-b245-5a576f4bddf9;IngestionEndpoint=https://norwayeast-0.in.applicationinsights.azure.com/;LiveEndpoint=https://norwayeast.livediagnostics.monitor.azure.com/";
 });
 
 builder.Services.AddTransient<TodoAcceptForUpdateService>();
