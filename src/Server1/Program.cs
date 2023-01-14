@@ -21,14 +21,19 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
 builder.Services.AddTransient<TodoAcceptForUpdateService>();
 builder.Services.AddTransient<TodoGetFromViewService>();
 
+builder.Services.AddHttpClient<TodoAcceptForUpdateService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:3500/v1.0/invoke/Server2/method/Todo");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+// }
 
 app.UseHealthChecks("/health");
 

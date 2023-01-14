@@ -28,7 +28,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       activeRevisionsMode: 'Single'
       maxInactiveRevisions: 2
       dapr: {
-        enabled: false
+        enabled: true
         appId: name
         appPort: 80
         appProtocol: 'http'

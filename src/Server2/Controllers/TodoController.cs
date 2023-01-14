@@ -4,7 +4,7 @@ using Server2.Todo;
 namespace Server2.Controllers;
 
 [ApiController]
-[Route("")]
+[Route("/Todo")]
 [Produces("application/json")]
 public class TodoController : Controller
 {
