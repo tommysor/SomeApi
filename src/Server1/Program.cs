@@ -1,4 +1,6 @@
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Server1;
 using Server1.Todo;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks()
     .AddCheck("Hello", () => HealthCheckResult.Healthy("World"));
 
+builder.Services.AddSingleton<ITelemetryInitializer>(new Server1TelemetryInitializer("Server1"));
 builder.Services.AddApplicationInsightsTelemetry(options => 
 {
     options.ConnectionString = "InstrumentationKey=e0366b75-cc68-4e00-b245-5a576f4bddf9;IngestionEndpoint=https://norwayeast-0.in.applicationinsights.azure.com/;LiveEndpoint=https://norwayeast.livediagnostics.monitor.azure.com/";
