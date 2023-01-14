@@ -31,4 +31,7 @@ app.UseHealthChecks("/health");
 
 app.MapControllers();
 
+// Something to do with Dapr Actors?
+app.MapGet("/dapr/config", () => new {});
+
 app.Run();
