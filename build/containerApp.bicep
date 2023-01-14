@@ -148,7 +148,7 @@ resource tableDataContributer 'Microsoft.Authorization/roleAssignments@2022-04-0
   name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
   properties: {
     principalType: 'ServicePrincipal'
-    roleDefinitionId: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
     principalId: containerApp.identity.principalId
   }
   scope: storage
