@@ -5,7 +5,6 @@ param containerImage string
 param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
-param storageQueueName string
 param tableName string
 
 @description('Array of objects with properties name and value')
@@ -35,12 +34,6 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       name: tableName
     }
   }
-  resource queue 'queueServices@2022-09-01' = {
-    name: 'default'
-    resource queue 'queues@2022-09-01' = {
-      name: storageQueueName
-    }
-  }
 }
 
 var environmentVariablesStore = [
@@ -51,10 +44,6 @@ var environmentVariablesStore = [
   {
     name: 'tableName'
     value: tableName
-  }
-  {
-    name: 'queueEndpoint'
-    value: storage.properties.primaryEndpoints.queue
   }
 ]
 

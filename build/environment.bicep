@@ -27,6 +27,21 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
+  name: 'containerServiceBus'
+  location: location
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+  }
+  properties: {
+    zoneRedundant: false
+  }
+  identity: {
+    type: 'SystemAssigned'
+  }
+}
+
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
   name: containerAppEnvName
   location: location
@@ -42,6 +57,19 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
       }
     }
     daprAIConnectionString: applicationInsights.properties.ConnectionString
+  }
+  resource serviceBusPubSub 'daprComponents@2022-06-01-preview' = {
+    name: 'serviceBusPubSub'
+    properties: {
+      componentType: 'pubsub.azure.servicebus'
+      version: 'v1'
+      metadata: [
+        {
+          name: 'namespaceName'
+          value: serviceBus.name
+        }
+      ]
+    }
   }
 }
 

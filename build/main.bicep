@@ -23,7 +23,6 @@ module server1 'containerApp.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: true
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    storageQueueName: 'view-queue'
     tableName: 'TodoView2'
   }
 }
@@ -38,7 +37,6 @@ module server2 'containerApp.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: false
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    storageQueueName: 'update-queue'
     tableName: 'Todos'
   }
 }
