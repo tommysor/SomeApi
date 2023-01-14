@@ -62,7 +62,7 @@ resource storage1 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   resource queue 'queueServices@2022-09-01' = {
     name: 'default'
     resource viewQueue 'queues@2022-09-01' = {
-      name: 'viewQueue'
+      name: 'view-queue'
     }
   }
 }
@@ -84,7 +84,7 @@ resource storage2 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   resource queue 'queueServices@2022-09-01' = {
     name: 'default'
     resource updateQueue 'queues@2022-09-01' = {
-      name: 'updateQueue'
+      name: 'update-queue'
     }
   }
 }
