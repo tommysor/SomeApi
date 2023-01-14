@@ -32,7 +32,7 @@ public class TodoController : Controller
     [ProducesResponseType(202)]
     [ProducesResponseType(typeof(string), 400)]
     [ProducesResponseType(typeof(string), 404)]
-    public async Task<IActionResult> Update([FromRoute]long id, [FromBody] object item)
+    public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody] TodoUpdateDto item)
     {
         if (item == null)
         {
@@ -53,7 +53,7 @@ public class TodoController : Controller
     [HttpDelete("{id}")]
     [ProducesResponseType(202)]
     [ProducesResponseType(typeof(string), 404)]
-    public async Task<IActionResult> Delete([FromRoute]long id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         // var existing = await _todoGetFromViewService.GetById(id);
         // if (existing == null)

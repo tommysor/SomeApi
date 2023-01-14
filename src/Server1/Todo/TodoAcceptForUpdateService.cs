@@ -1,6 +1,5 @@
 namespace Server1.Todo;
 
-//todo Implement class TodoAcceptForUpdateService
 public class TodoAcceptForUpdateService
 {
     private readonly HttpClient _httpClient;
@@ -15,13 +14,13 @@ public class TodoAcceptForUpdateService
         await _httpClient.PostAsJsonAsync("", item);
     }
 
-    public async Task Update(long id, TodoUpdateDto item)
+    public async Task Update(Guid id, TodoUpdateDto item)
     {
-        await Task.CompletedTask;
+        await _httpClient.PutAsJsonAsync($"{id}", item);
     }
 
-    public async Task Delete(long id)
+    public async Task Delete(Guid id)
     {
-        await Task.CompletedTask;
+        await _httpClient.DeleteAsync($"{id}");
     }
 }

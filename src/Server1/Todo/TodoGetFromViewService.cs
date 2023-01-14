@@ -40,7 +40,7 @@ public class TodoGetFromViewService
         return dummy;
     }
 
-    public async Task<TodoGetDto> GetById(long id)
+    public async Task<TodoGetDto> GetById(Guid id)
     {
         var todo = new TodoGetDto
         {
