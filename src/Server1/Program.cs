@@ -28,7 +28,6 @@ builder.Services.AddHttpClient<TodoAcceptForUpdateService>((services, client) =>
     var configuration = services.GetRequiredService<IConfiguration>();
     var endpoint = configuration["SaveChangeEndpoint"]!;
     client.BaseAddress = new Uri(endpoint);
-    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
 });
 
 builder.Services.AddTransient<TableClient>(services =>
