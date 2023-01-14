@@ -19,9 +19,9 @@ public class TodoController : Controller
 
     [HttpGet]
     [Route("all")]
-    public async Task<IList<TodoGetDto>> GetAll()
+    public async Task<IList<TodoGetDto>> GetAll(CancellationToken cancellationToken)
     {
-        var result = await _todoGetFromViewService.GetAll();
+        var result = await _todoGetFromViewService.GetAll(cancellationToken);
         return result;
     }
 

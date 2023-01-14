@@ -6,6 +6,10 @@ param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
 
+// Replace with list of arbitrary environment variables?
+param env1 string
+param env2 string
+
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: name
   location: location
@@ -51,6 +55,14 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             {
               name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
               value: applicationInsightsConnectionString
+            }
+            {
+              name: 'env1'
+              value: env1
+            }
+            {
+              name: 'env2'
+              value: env2
             }
           ]
           probes: [

@@ -1,27 +1,36 @@
+using Azure.Data.Tables;
+
 namespace Server1.Todo;
 
 //todo Implement class TodoGetFromViewService
 public class TodoGetFromViewService
 {
-    public TodoGetFromViewService()
+    private readonly TableClient _tableClient;
+
+    public TodoGetFromViewService(TableClient tableClient)
     {
-        
+        _tableClient = tableClient;
     }
 
-    public async Task<IList<TodoGetDto>> GetAll()
+    public async Task<IList<TodoGetDto>> GetAll(CancellationToken cancellationToken)
     {
-        var dummy = new[]
+        var query = _tableClient.QueryAsync<TodoStoredView>(x => true, maxPerPage: 20, cancellationToken: cancellationToken);
+        var pages = query.AsPages();
+        var result = new List<TodoGetDto>();
+        await foreach (var page in pages)
         {
-            new TodoGetDto
+            foreach (var item in page.Values)
             {
-                Id = 1,
-                Name = "dummy all",
-                IsComplete = false
+                result.Add(new TodoGetDto
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    IsComplete = item.IsComplete
+                });
             }
-        };
+        }
 
-        await Task.CompletedTask;
-        return dummy;
+        return result;
     }
 
     public async Task<IList<TodoGetDto>> GetMy()
@@ -30,7 +39,7 @@ public class TodoGetFromViewService
         {
             new TodoGetDto
             {
-                Id = 1,
+                Id = Guid.Empty,
                 Name = "dummy my",
                 IsComplete = false
             }
@@ -44,7 +53,7 @@ public class TodoGetFromViewService
     {
         var todo = new TodoGetDto
         {
-            Id = 1,
+            Id = Guid.Empty,
             Name = "dummy",
             IsComplete = false
         };

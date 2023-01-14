@@ -92,8 +92,8 @@ resource storage2 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 output containerAppEnvId string = containerAppEnv.id
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
 
-output storage1ConnectionString string = storage1.properties.primaryEndpoints.table
-output storage1QueueConnectionString string = storage1.properties.primaryEndpoints.queue
+output storage1TableEndpoint string = storage1.properties.primaryEndpoints.table
+output storage1QueueEndpoint string = storage1.properties.primaryEndpoints.queue
 
-output storage2ConnectionString string = storage2.properties.primaryEndpoints.table
-output storage2QueueConnectionString string = storage2.properties.primaryEndpoints.queue
+output storage2TableEndpoint string = storage2.properties.primaryEndpoints.table
+output storage2QueueEndpoint string = storage2.properties.primaryEndpoints.queue
