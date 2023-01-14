@@ -162,7 +162,7 @@ resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' =
 }
 
 resource queueContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
+  name: guid(resourceGroup().id, containerApp.id, 'queuestorage')
   properties: {
     principalType: 'ServicePrincipal'
     // Storage Queue Data Contributor
