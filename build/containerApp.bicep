@@ -18,7 +18,7 @@ var environmentVariablesInternal = [
 ]
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: '${name}storage${uniqueString(guid(resourceGroup().id))}'
+  name: '${name}${uniqueString(guid(resourceGroup().id))}'
   location: location
   kind: 'StorageV2'
   sku: {
