@@ -1,6 +1,7 @@
 param location string
 param containerAppLogAnalyticsName string
 param containerAppEnvName string
+param serviceBusName string
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: containerAppLogAnalyticsName
@@ -27,26 +28,6 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
-  name: 'containerServiceBus'
-  location: location
-  sku: {
-    name: 'Standard'
-    tier: 'Standard'
-  }
-  properties: {
-    zoneRedundant: false
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-}
-
-resource sendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topics@2022-01-01-preview' = {
-  name: 'send-update-request'
-  parent: serviceBus
-}
-
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
   name: containerAppEnvName
   location: location
@@ -71,7 +52,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
       metadata: [
         {
           name: 'namespaceName'
-          value: serviceBus.properties.serviceBusEndpoint
+          value: '${serviceBusName}.servicebus.windows.net'
         }
       ]
     }
@@ -80,4 +61,3 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 
 output containerAppEnvId string = containerAppEnv.id
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
-// output sendUpdateRequestQueueId string = sendUpdateRequestTopic.id

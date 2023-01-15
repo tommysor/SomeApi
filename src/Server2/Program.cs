@@ -13,10 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
 
 builder.Services.AddSingleton<ITelemetryInitializer>(new Server2TelemetryInitializer("Server2"));
-builder.Services.AddApplicationInsightsTelemetry(options => 
-{
-    // options.ConnectionString = "InstrumentationKey=e0366b75-cc68-4e00-b245-5a576f4bddf9;IngestionEndpoint=https://norwayeast-0.in.applicationinsights.azure.com/;LiveEndpoint=https://norwayeast.livediagnostics.monitor.azure.com/";
-});
+builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
@@ -30,8 +27,5 @@ if (app.Environment.IsDevelopment())
 app.UseHealthChecks("/health");
 
 app.MapControllers();
-
-// Something to do with Dapr Actors?
-app.MapGet("/dapr/config", () => new {});
 
 app.Run();

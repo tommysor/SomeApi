@@ -17,7 +17,8 @@ public class TodoAcceptForUpdateService
             Id = Guid.Empty,
             Body = item
         };
-        await _httpClient.PostAsJsonAsync("", message);
+        var response = await _httpClient.PostAsJsonAsync("", message);
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task Update(Guid id, TodoUpdateDto item)
@@ -28,7 +29,8 @@ public class TodoAcceptForUpdateService
             Id = id,
             Body = item
         };
-        await _httpClient.PostAsJsonAsync("", message);
+        var response = await _httpClient.PostAsJsonAsync("", message);
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task Delete(Guid id)
@@ -39,6 +41,7 @@ public class TodoAcceptForUpdateService
             Id = id,
             Body = new{}
         };
-        await _httpClient.PostAsJsonAsync("", message);
+        var response = await _httpClient.PostAsJsonAsync("", message);
+        response.EnsureSuccessStatusCode();
     }
 }
