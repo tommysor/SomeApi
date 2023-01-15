@@ -88,7 +88,7 @@ resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleA
     principalType: 'ServicePrincipal'
     // Azure Service Bus Data Receiver
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
-    principalId: server1.outputs.containerAppPrincipalId
+    principalId: server2.outputs.containerAppPrincipalId
   }
   scope: serviceBusSendUpdateRequestTopic
 }
