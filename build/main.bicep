@@ -23,7 +23,7 @@ module server1 'containerApp.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: true
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    tableName: 'TodoView2'
+    tableName: 'TodoView'
   }
 }
 

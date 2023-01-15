@@ -31,8 +31,8 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   name: 'containerServiceBus'
   location: location
   sku: {
-    name: 'Basic'
-    tier: 'Basic'
+    name: 'Standard'
+    tier: 'Standard'
   }
   properties: {
     zoneRedundant: false
@@ -42,7 +42,7 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   }
 }
 
-resource sendUpdateRequestQueue 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+resource sendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topics@2022-01-01-preview' = {
   name: 'send-update-request'
   parent: serviceBus
 }
@@ -80,4 +80,4 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 
 output containerAppEnvId string = containerAppEnv.id
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
-output sendUpdateRequestQueueId string = sendUpdateRequestQueue.id
+// output sendUpdateRequestQueueId string = sendUpdateRequestTopic.id
