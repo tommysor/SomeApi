@@ -25,4 +25,3 @@ az role assignment create --assignee "6f17d366-db52-47f2-9e0f-b7f0f1f08f7c" \
                           --role "User Access Administrator" \
                           --scope $scope
 ```
-
