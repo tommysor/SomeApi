@@ -71,7 +71,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
       metadata: [
         {
           name: 'namespaceName'
-          value: serviceBus.name
+          value: serviceBus.properties.serviceBusEndpoint
         }
       ]
     }
