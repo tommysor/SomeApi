@@ -150,15 +150,16 @@ resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' =
   scope: storage
 }
 
-resource queueContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, 'queuestorage')
-  properties: {
-    principalType: 'ServicePrincipal'
-    // Storage Queue Data Contributor
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '974c5e8b-45b9-4653-ba55-5f855dd0fb88')
-    principalId: containerApp.identity.principalId
-  }
-  scope: storage
-}
+// resource queueSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, containerApp.id, 'queueSender')
+//   properties: {
+//     principalType: 'ServicePrincipal'
+//     //todo - change to service bus sender
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '974c5e8b-45b9-4653-ba55-5f855dd0fb88')
+//     principalId: containerApp.identity.principalId
+//   }
+//   //todo - change to service bus queue 
+//   scope: resourceId('Microsoft.ServiceBus/namespaces/queues', queueId)
+// }
 
 output ingressFqdn string = containerApp.properties.configuration.ingress.fqdn

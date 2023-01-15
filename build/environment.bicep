@@ -40,9 +40,11 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   identity: {
     type: 'SystemAssigned'
   }
-  // resource sendUpdateRequestQueue 'queues@2022-01-01-preview' = {
-  //   name: 'send-update-request'
-  // }
+}
+
+resource sendUpdateRequestQueue 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+  name: 'send-update-request'
+  parent: serviceBus
 }
 
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
@@ -78,3 +80,4 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 
 output containerAppEnvId string = containerAppEnv.id
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
+output sendUpdateRequestQueueId string = sendUpdateRequestQueue.id
