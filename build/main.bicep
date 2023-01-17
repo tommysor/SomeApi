@@ -26,6 +26,11 @@ resource serviceBusSendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topic
   parent: serviceBus
 }
 
+resource serviceBusSendUpdateRequestSubscription 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-01-01-preview' = {
+  name: 'server2'
+  parent: serviceBusSendUpdateRequestTopic
+}
+
 // Environment
 module environment 'environment.bicep' = {
   name: 'containerAppEnv'
@@ -90,7 +95,7 @@ resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleA
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
     principalId: server2.outputs.containerAppPrincipalId
   }
-  scope: serviceBusSendUpdateRequestTopic
+  scope: serviceBusSendUpdateRequestSubscription
 }
 
 output server1FQDN string = server1.outputs.ingressFqdn
