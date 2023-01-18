@@ -18,7 +18,7 @@ var environmentVariablesInternal = [
 ]
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: '${name}${uniqueString(guid(resourceGroup().id))}'
+  name: '${name}2${uniqueString(guid(resourceGroup().id))}'
   location: location
   kind: 'StorageV2'
   sku: {
@@ -140,7 +140,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
 }
 
 resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, 'tablestorage')
+  name: guid(resourceGroup().id, containerApp.id, 'tablestorage2')
   properties: {
     principalType: 'ServicePrincipal'
     // Storage Table Data Contributor

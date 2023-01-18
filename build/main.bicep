@@ -6,7 +6,7 @@ param server2ContainerImage string
 
 // ServiceBus
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
-  name: 'containerServiceBus'
+  name: 'containerServiceBus2'
   location: location
   sku: {
     name: 'Standard'
@@ -33,7 +33,7 @@ resource serviceBusSendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topic
 
 // Environment
 module environment 'environment.bicep' = {
-  name: 'containerAppEnv'
+  name: 'containerAppEnv2'
   params: {
     location: location
     containerAppLogAnalyticsName: 'containerAppLogAnalyticsName'
@@ -44,11 +44,11 @@ module environment 'environment.bicep' = {
 
 // Container apps
 module server1 'containerApp.bicep' = {
-  name: 'server1'
+  name: 'server11'
   params: {
     location: location
     environmentId: environment.outputs.containerAppEnvId
-    name: 'server1'
+    name: 'server11'
     containerImage: server1ContainerImage
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: true
@@ -58,11 +58,11 @@ module server1 'containerApp.bicep' = {
 }
 
 module server2 'containerApp.bicep' = {
-  name: 'server2'
+  name: 'server22'
   params: {
     location: location
     environmentId: environment.outputs.containerAppEnvId
-    name: 'server2'
+    name: 'server22'
     containerImage: server2ContainerImage
     revisionSuffix: containerImageRevisionSuffix
     ingressExternal: false
@@ -77,7 +77,7 @@ module server2 'containerApp.bicep' = {
 
 // serviceBusSendUpdateRequestTopic
 resource serviceBusSendUpdateRequestTopicSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, server1.name, 'serviceBusSendUpdateRequestTopic')
+  name: guid(resourceGroup().id, server1.name, 'serviceBusSendUpdateRequestTopic2')
   properties: {
     principalType: 'ServicePrincipal'
     // Azure Service Bus Data Sender
@@ -99,7 +99,7 @@ resource serviceBusSendUpdateRequestTopicSender 'Microsoft.Authorization/roleAss
 // }
 
 resource serviceBusSendUpdateRequestTopicReceiverOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopicOwner')
+  name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopicOwner2')
   properties: {
     principalType: 'ServicePrincipal'
     // Azure Service Bus Data Owner

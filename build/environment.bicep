@@ -18,7 +18,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'containerApplicationInsights'
+  name: 'containerApplicationInsights2'
   location: location
   kind: 'web'
   properties: {
