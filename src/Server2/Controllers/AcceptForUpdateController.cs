@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using Dapr;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class AcceptForUpdateController : Controller
 
     [HttpPost("AcceptForUpdate")]
     [Topic("servicebus-pub-sub", "send-update-request")]
-    public async Task<IActionResult> AcceptForUpdate([FromBody] string item)
+    public async Task<IActionResult> AcceptForUpdate([FromBody] ProcessMessageEventArgs item)
     {
         _logger.LogInformation("AcceptForUpdate: {item}", item);
         await Task.CompletedTask;
