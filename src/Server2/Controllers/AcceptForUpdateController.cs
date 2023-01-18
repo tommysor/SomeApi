@@ -3,6 +3,7 @@ using System.Text;
 using Azure.Messaging.ServiceBus;
 using Dapr;
 using Microsoft.AspNetCore.Mvc;
+using Server2.Todo;
 
 namespace Server2.Controllers;
 
@@ -28,19 +29,9 @@ public class AcceptForUpdateController : Controller
 
     [HttpPost("AcceptForUpdate")]
     [Topic("servicebus-pub-sub", "send-update-request")]
-    public async Task<IActionResult> AcceptForUpdate([FromBody] dynamic item)
+    public async Task<IActionResult> AcceptForUpdate([FromBody] TodoCreateDto item)
     {
-        var context = _httpContextAccessor.HttpContext;
-        var x = await context.Request.BodyReader.ReadAsync();
-        var bytes = x.Buffer.ToArray();
-        var x2 = Encoding.UTF8.GetString(bytes);
-        _logger.LogInformation("AcceptForUpdate Body: {x2}", x2);
-
-        // _logger.LogInformation("AcceptForUpdate: {item}", item);
-
-        // var x1 = item.Body.ToArray();
-        // var x2 = Encoding.UTF8.GetString(x1);
-        // _logger.LogInformation("AcceptForUpdate Body: {x2}", x2);
+        _logger.LogInformation("AcceptForUpdate: {item}", item?.Name);
 
         await Task.CompletedTask;
         return Accepted();
