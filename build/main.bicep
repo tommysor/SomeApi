@@ -26,10 +26,10 @@ resource serviceBusSendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topic
   parent: serviceBus
 }
 
-resource serviceBusSendUpdateRequestSubscription 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-01-01-preview' = {
-  name: 'server2'
-  parent: serviceBusSendUpdateRequestTopic
-}
+// resource serviceBusSendUpdateRequestSubscription 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-01-01-preview' = {
+//   name: 'server2'
+//   parent: serviceBusSendUpdateRequestTopic
+// }
 
 // Environment
 module environment 'environment.bicep' = {
@@ -87,12 +87,23 @@ resource serviceBusSendUpdateRequestTopicSender 'Microsoft.Authorization/roleAss
   scope: serviceBusSendUpdateRequestTopic
 }
 
-resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopic')
+// resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopic')
+//   properties: {
+//     principalType: 'ServicePrincipal'
+//     // Azure Service Bus Data Receiver
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
+//     principalId: server2.outputs.containerAppPrincipalId
+//   }
+//   scope: serviceBusSendUpdateRequestTopic
+// }
+
+resource serviceBusSendUpdateRequestTopicReceiverOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopicOwner')
   properties: {
     principalType: 'ServicePrincipal'
-    // Azure Service Bus Data Receiver
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
+    // Azure Service Bus Data Owner
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '090c5cfd-751d-490a-894a-3ce6f1109419')
     principalId: server2.outputs.containerAppPrincipalId
   }
   scope: serviceBusSendUpdateRequestTopic
