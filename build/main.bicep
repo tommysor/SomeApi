@@ -95,7 +95,7 @@ resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleA
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
     principalId: server2.outputs.containerAppPrincipalId
   }
-  scope: serviceBusSendUpdateRequestSubscription
+  scope: serviceBusSendUpdateRequestTopic
 }
 
 output server1FQDN string = server1.outputs.ingressFqdn
