@@ -23,7 +23,7 @@ public class AcceptForUpdateController : Controller
 
     [HttpPost("AcceptForUpdate")]
     [Topic("servicebus-pub-sub", "send-update-request")]
-    public async Task<IActionResult> AcceptForUpdate([FromBody] AcceptForUpdateDto item)
+    public async Task<IActionResult> AcceptForUpdate([FromBody] string item)
     {
         _logger.LogInformation("AcceptForUpdate: {item}", item);
         await Task.CompletedTask;
