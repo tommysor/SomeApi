@@ -1,6 +1,6 @@
 namespace Server2.Todo;
 
-public class TodoCreateDto
+public sealed class TodoCreateDto
 {
     public string Name { get; set; } = default!;
 }
