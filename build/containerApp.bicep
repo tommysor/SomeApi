@@ -6,6 +6,7 @@ param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
 param tableName string
+param serviceBusTriggerTopicName string = ''
 @secure()
 param serviceBusTriggerConnectionString string = ''
 
@@ -148,7 +149,8 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             custom: {
               type: 'azure-servicebus'
               metadata: {
-                queueName: name
+                topicName: serviceBusTriggerTopicName
+                subscriptionName: name
                 namespace: 'containerservicebus2.servicebus.windows.net'
                 messageCount: '1'
               }

@@ -70,6 +70,7 @@ module server2 'containerApp.bicep' = {
     ingressExternal: false
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
     tableName: 'Todos'
+    serviceBusTriggerTopicName: serviceBusSendUpdateRequestTopic.name
     serviceBusTriggerConnectionString: queueTriggerConnectionString
   }
 }
