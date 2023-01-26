@@ -1,6 +1,5 @@
 # SomeApi
 
-
 ## GitHub Action Deploy
 ### Credentials
 `secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS` should contain the output from:
