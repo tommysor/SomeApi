@@ -71,6 +71,6 @@ jobs:
         scope: resourcegroup
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./build/main.bicep
-        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }}'
+        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} queueTriggerConnectionString=${{ secrets.AZURE_SOMEAPI_QUEUE_TRIGGER_CONNECTION_STRING }}'
         deploymentMode: Complete
         deploymentName: ${{ github.sha }}

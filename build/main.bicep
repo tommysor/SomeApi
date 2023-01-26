@@ -3,6 +3,8 @@ param containerAppEnvName string = 'containerAppEnvName'
 param containerImageRevisionSuffix string
 param server1ContainerImage string
 param server2ContainerImage string
+@secure()
+param queueTriggerConnectionString string
 
 // ServiceBus
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
@@ -68,6 +70,7 @@ module server2 'containerApp.bicep' = {
     ingressExternal: false
     applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
     tableName: 'Todos'
+    serviceBusTriggerConnectionString: queueTriggerConnectionString
   }
 }
 

@@ -6,6 +6,8 @@ param revisionSuffix string
 param ingressExternal bool
 param applicationInsightsConnectionString string
 param tableName string
+@secure()
+param serviceBusTriggerConnectionString string = ''
 
 @description('Array of objects with properties name and value')
 param environmentVariables array = []
@@ -79,6 +81,12 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
         enableApiLogging: true
         logLevel: 'info'
       }
+      secrets: [
+        {
+          name: 'connection-string-secret'
+          value: serviceBusTriggerConnectionString
+        }
+      ]
     }
     template: {
       revisionSuffix: revisionSuffix
@@ -134,6 +142,25 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       scale: {
         minReplicas: 0
         maxReplicas: 1
+        rules: serviceBusTriggerConnectionString == '' ? [] : [
+          {
+            name: 'azure-servicebus-queue-rule'
+            custom: {
+              type: 'azure-servicebus'
+              metadata: {
+                queueName: name
+                namespace: 'containerservicebus2.servicebus.windows.net'
+                messageCount: '1'
+              }
+              auth: [
+                {
+                  secretRef: 'connection-string-secret'
+                  triggerParameter: 'connection'
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   }
