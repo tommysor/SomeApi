@@ -2,6 +2,7 @@ param location string
 param environmentId string
 param containerImage string
 param revisionSuffix string
+param environmentRgName string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
 param logAnalyticsId string
@@ -41,6 +42,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existing = {
   name: serviceBusName
+  scope: resourceGroup(environmentRgName)
   resource createTodoTopic 'topics@2022-01-01-preview' existing = {
     name: serviceBusCreateTodoTopicName
   }

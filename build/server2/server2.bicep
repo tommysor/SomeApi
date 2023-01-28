@@ -3,10 +3,11 @@ param logAnalyticsId string
 param environmentId string
 param containerImage string
 param revisionSuffix string
+param environmentRgName string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
 
-var appName = 'todoprocessing'
+var appName = 'process'
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: '${resourceGroup().name}-ai'
@@ -55,10 +56,12 @@ var environmentVariables = [
 
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existing = {
   name: serviceBusName
+  scope: resourceGroup(environmentRgName)
   resource createTodoTopic 'topics@2022-01-01-preview' existing = {
     name: serviceBusCreateTodoTopicName
     resource queueTriggerAutorization 'authorizationRules@2022-01-01-preview' = {
       name: 'QueueTriggerAccessKey'
+      
       properties: {
         rights: [
           'Manage'
