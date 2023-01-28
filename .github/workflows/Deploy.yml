@@ -68,6 +68,7 @@ jobs:
         image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
       with:
         scope: subscription
+        region: 'norwayeast'
         template: ./build/main.bicep
         parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
         deploymentMode: Complete
