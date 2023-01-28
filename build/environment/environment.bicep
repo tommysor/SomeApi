@@ -1,10 +1,9 @@
-param location string
-param containerAppLogAnalyticsName string
-param containerAppEnvName string
-param serviceBusName string
+param location string = resourceGroup().location
+
+var rgUniqueString = uniqueString(resourceGroup().id)
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: containerAppLogAnalyticsName
+  name: 'logWs${rgUniqueString}'
   location: location
   properties: {
     sku: {
@@ -18,7 +17,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'containerApplicationInsights2'
+  name: 'ai${rgUniqueString}'
   location: location
   kind: 'web'
   properties: {
@@ -28,8 +27,26 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
+  name: 'sb${rgUniqueString}'
+  location: location
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {
+    zoneRedundant: false
+  }
+  identity: {
+    type: 'SystemAssigned'
+  }
+  resource createTodoTopic 'topics@2022-01-01-preview' = {
+    name: 'create-todo'
+  }
+}
+
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
-  name: containerAppEnvName
+  name: 'appEnv${rgUniqueString}'
   location: location
   sku: {
     name: 'Consumption'
@@ -52,12 +69,14 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
       metadata: [
         {
           name: 'namespaceName'
-          value: '${serviceBusName}.servicebus.windows.net'
+          value: '${serviceBus.name}.servicebus.windows.net'
         }
       ]
     }
   }
 }
 
-output containerAppEnvId string = containerAppEnv.id
-output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
+output containerAppEnvironmentId string = containerAppEnv.id
+output logAnalyticsId string = logAnalytics.id
+output serviceBusName string = serviceBus.name
+output serviceBusCreateTodoTopicName string = serviceBus::createTodoTopic.name

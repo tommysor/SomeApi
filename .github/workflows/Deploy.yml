@@ -2,7 +2,6 @@ name: Deploy
 
 env:
   GITHUB_REPOSITORY_LOWERCASE: 'placeholder_GITHUB_REPOSITORY_LOWERCASE'
-  image_tag_server1: 'placeholder_image_tag_server1'
 
 on:
   push:
@@ -68,9 +67,8 @@ jobs:
         image_tag_server1: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
         image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
       with:
-        scope: resourcegroup
-        resourceGroupName: ${{ secrets.AZURE_RG }}
+        scope: subscription
         template: ./build/main.bicep
-        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }}'
+        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
         deploymentMode: Complete
         deploymentName: ${{ github.sha }}

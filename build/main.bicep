@@ -1,113 +1,60 @@
-param location string = resourceGroup().location
-param containerAppEnvName string = 'containerAppEnvName'
+targetScope = 'subscription'
+
+param location string = 'norwayeast'
+param environmentRgName string
+param apiRgName string
+param processingRgName string
 param containerImageRevisionSuffix string
 param server1ContainerImage string
 param server2ContainerImage string
 
-// ServiceBus
-resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
-  name: 'containerServiceBus2'
-  location: location
-  sku: {
-    name: 'Standard'
-    tier: 'Standard'
-  }
-  properties: {
-    zoneRedundant: false
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  
-}
-
-resource serviceBusSendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topics@2022-01-01-preview' = {
-  name: 'send-update-request'
-  parent: serviceBus
-  resource queueTriggerAutorization 'authorizationRules@2022-01-01-preview' = {
-    name: 'QueueTriggerAccessKey'
-    properties: {
-      rights: [
-        'Listen'
-        'Manage'
-        'Send'
-      ]
-    }
-  }
-}
-
-var queueTriggerConnectionString = listKeys(
-  serviceBusSendUpdateRequestTopic::queueTriggerAutorization.id, 
-  serviceBusSendUpdateRequestTopic::queueTriggerAutorization.apiVersion
-  ).primaryConnectionString
-
-// Environment
-module environment 'environment.bicep' = {
-  name: 'containerAppEnv2'
+module resourceGroups 'environment/resourceGroups.bicep' = {
+  name: 'resourceGroups'
   params: {
     location: location
-    containerAppLogAnalyticsName: 'containerAppLogAnalyticsName'
-    containerAppEnvName: containerAppEnvName
-    serviceBusName: serviceBus.name
+    environmentRgName: environmentRgName
+    apiRgName: apiRgName
+    processingRgName: processingRgName
   }
 }
 
-// Container apps
-module server1 'containerApp.bicep' = {
-  name: 'server11'
+module environment 'environment/environment.bicep' = {
+  name: 'environment'
+  scope: resourceGroup(environmentRgName)
+  dependsOn: [
+    resourceGroups
+  ]
   params: {
     location: location
-    environmentId: environment.outputs.containerAppEnvId
-    name: 'server11'
+  }
+}
+
+module server1 'server1/server1.bicep' = {
+  name: 'server1'
+  scope: resourceGroup(apiRgName)
+  params: {
+    location: location
+    logAnalyticsId: environment.outputs.logAnalyticsId
+    environmentId: environment.outputs.containerAppEnvironmentId
     containerImage: server1ContainerImage
     revisionSuffix: containerImageRevisionSuffix
-    ingressExternal: true
-    applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    tableName: 'TodoView'
+    serviceBusName: environment.outputs.serviceBusName
+    serviceBusCreateTodoTopicName: environment.outputs.serviceBusCreateTodoTopicName
   }
 }
 
-module server2 'containerApp.bicep' = {
-  name: 'server22'
+module server2 'server2/server2.bicep' = {
+  name: 'server2'
+  scope: resourceGroup(processingRgName)
   params: {
     location: location
-    environmentId: environment.outputs.containerAppEnvId
-    name: 'server22'
+    logAnalyticsId: environment.outputs.logAnalyticsId
+    environmentId: environment.outputs.containerAppEnvironmentId
     containerImage: server2ContainerImage
     revisionSuffix: containerImageRevisionSuffix
-    ingressExternal: false
-    applicationInsightsConnectionString: environment.outputs.applicationInsightsConnectionString
-    tableName: 'Todos'
-    serviceBusTriggerTopicName: serviceBusSendUpdateRequestTopic.name
-    serviceBusTriggerConnectionString: queueTriggerConnectionString
+    serviceBusName: environment.outputs.serviceBusName
+    serviceBusCreateTodoTopicName: environment.outputs.serviceBusCreateTodoTopicName
   }
-}
-
-// --
-// Permissions
-// --
-
-// serviceBusSendUpdateRequestTopic
-resource serviceBusSendUpdateRequestTopicSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, server1.name, 'serviceBusSendUpdateRequestTopic2')
-  properties: {
-    principalType: 'ServicePrincipal'
-    // Azure Service Bus Data Sender
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')
-    principalId: server1.outputs.containerAppPrincipalId
-  }
-  scope: serviceBusSendUpdateRequestTopic
-}
-
-resource serviceBusSendUpdateRequestTopicReceiverOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopicOwner2')
-  properties: {
-    principalType: 'ServicePrincipal'
-    // Azure Service Bus Data Owner
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '090c5cfd-751d-490a-894a-3ce6f1109419')
-    principalId: server2.outputs.containerAppPrincipalId
-  }
-  scope: serviceBusSendUpdateRequestTopic
 }
 
 output server1FQDN string = server1.outputs.ingressFqdn

@@ -1,27 +1,26 @@
 param location string
 param environmentId string
-param name string
 param containerImage string
 param revisionSuffix string
-param ingressExternal bool
-param applicationInsightsConnectionString string
-param tableName string
-param serviceBusTriggerTopicName string = ''
-@secure()
-param serviceBusTriggerConnectionString string = ''
+param serviceBusName string
+param serviceBusCreateTodoTopicName string
+param logAnalyticsId string
 
-@description('Array of objects with properties name and value')
-param environmentVariables array = []
+var appName = 'todoapi'
 
-var environmentVariablesInternal = [
-  {
-    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-    value: applicationInsightsConnectionString
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: '${resourceGroup().name}-ai'
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    RetentionInDays: 30
+    WorkspaceResourceId: logAnalyticsId
   }
-]
+}
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: '${name}2${uniqueString(guid(resourceGroup().id))}'
+  name: 'storage${uniqueString(resourceGroup().id)}'
   location: location
   kind: 'StorageV2'
   sku: {
@@ -34,26 +33,28 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   resource table 'tableServices@2022-09-01' = {
     name: 'default'
     resource table 'tables@2022-09-01' = {
-      name: tableName
+      name: 'todos'
     }
   }
 }
 
-var environmentVariablesStore = [
+var environmentVariables = [
+  {
+    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+    value: applicationInsights.properties.ConnectionString
+  }
   {
     name: 'tableEndpoint'
     value: storage.properties.primaryEndpoints.table
   }
   {
     name: 'tableName'
-    value: tableName
+    value: storage::table.name
   }
 ]
 
-var environmentVariablesUnion = union(environmentVariablesInternal, environmentVariablesStore, environmentVariables)
-
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
-  name: name
+  name: appName
   location: location
   identity: {
     type: 'SystemAssigned'
@@ -62,7 +63,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
     environmentId: environmentId
     configuration: {
       ingress: {
-        external: ingressExternal
+        external: true
         targetPort: 80
         allowInsecure: false
         traffic: [
@@ -76,30 +77,24 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       maxInactiveRevisions: 2
       dapr: {
         enabled: true
-        appId: name
+        appId: appName
         appPort: 80
         appProtocol: 'http'
         enableApiLogging: true
         logLevel: 'info'
       }
-      secrets: [
-        {
-          name: 'connection-string-secret'
-          value: serviceBusTriggerConnectionString
-        }
-      ]
     }
     template: {
       revisionSuffix: revisionSuffix
       containers: [
         {
-          name: name
+          name: appName
           image: containerImage
           resources: {
             cpu: json('.25')
             memory: '.5Gi'
           }
-          env: environmentVariablesUnion
+          env: environmentVariables
           probes: [
             {
               type: 'Startup'
@@ -143,41 +138,38 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       scale: {
         minReplicas: 0
         maxReplicas: 1
-        rules: serviceBusTriggerConnectionString == '' ? [] : [
-          {
-            name: 'azure-servicebus-queue-rule'
-            custom: {
-              type: 'azure-servicebus'
-              metadata: {
-                topicName: serviceBusTriggerTopicName
-                subscriptionName: name
-                namespace: 'containerservicebus2.servicebus.windows.net'
-                messageCount: '1'
-              }
-              auth: [
-                {
-                  secretRef: 'connection-string-secret'
-                  triggerParameter: 'connection'
-                }
-              ]
-            }
-          }
-        ]
       }
     }
   }
 }
 
+var storageTableDataContributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
 resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, 'tablestorage2')
+  name: guid(resourceGroup().id, storage.id, storage::table.id, containerApp.id, storageTableDataContributor)
   properties: {
     principalType: 'ServicePrincipal'
-    // Storage Table Data Contributor
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
+    roleDefinitionId: storageTableDataContributor
     principalId: containerApp.identity.principalId
   }
   scope: storage
 }
 
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existing = {
+  name: serviceBusName
+  resource createTodoTopic 'topics@2022-01-01-preview' existing = {
+    name: serviceBusCreateTodoTopicName
+  }
+}
+
+var serviceBusDataSender = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')
+resource sendCreateTodoMessage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, containerApp.id, serviceBus::createTodoTopic.id, serviceBusDataSender)
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: serviceBusDataSender
+    principalId: containerApp.identity.principalId
+  }
+  scope: serviceBus::createTodoTopic
+}
+
 output ingressFqdn string = containerApp.properties.configuration.ingress.fqdn
-output containerAppPrincipalId string = containerApp.identity.principalId
