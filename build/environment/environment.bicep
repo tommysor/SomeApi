@@ -80,3 +80,4 @@ output containerAppEnvironmentId string = containerAppEnv.id
 output logAnalyticsId string = logAnalytics.id
 output serviceBusName string = serviceBus.name
 output serviceBusCreateTodoTopicName string = serviceBus::createTodoTopic.name
+output daprServiceBusPubSubName string = containerAppEnv::serviceBusPubSub.name

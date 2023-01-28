@@ -25,8 +25,10 @@ builder.Services.AddTransient<TodoGetFromViewService>();
 
 builder.Services.AddHttpClient<TodoAcceptForUpdateService>((services, client) =>
 {
+    var logger = services.GetRequiredService<ILogger<TodoAcceptForUpdateService>>();
     var configuration = services.GetRequiredService<IConfiguration>();
-    var endpoint = configuration["SaveChangeEndpoint"]!;
+    var endpoint = configuration["createTodoPublishUrl"]!;
+    logger.LogInformation("Publish endpoint: {endpoint}", endpoint);
     client.BaseAddress = new Uri(endpoint);
 });
 
@@ -45,12 +47,8 @@ builder.Services.AddTransient<TableClient>(services =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-// }
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHealthChecks("/health");
 

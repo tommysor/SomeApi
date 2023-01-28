@@ -5,6 +5,7 @@ param revisionSuffix string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
 param logAnalyticsId string
+param daprServiceBusPubSubName string
 
 var appName = 'todoapi'
 
@@ -38,6 +39,15 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existing = {
+  name: serviceBusName
+  resource createTodoTopic 'topics@2022-01-01-preview' existing = {
+    name: serviceBusCreateTodoTopicName
+  }
+}
+
+var createTodoPublishUrl = 'http://localhost:3500/v1.0/publish/${daprServiceBusPubSubName}/${serviceBus::createTodoTopic.name}'
+
 var environmentVariables = [
   {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -50,6 +60,10 @@ var environmentVariables = [
   {
     name: 'tableName'
     value: storage::table.name
+  }
+  {
+    name: 'createTodoPublishUrl'
+    value: createTodoPublishUrl
   }
 ]
 
@@ -152,13 +166,6 @@ resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' =
     principalId: containerApp.identity.principalId
   }
   scope: storage
-}
-
-resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existing = {
-  name: serviceBusName
-  resource createTodoTopic 'topics@2022-01-01-preview' existing = {
-    name: serviceBusCreateTodoTopicName
-  }
 }
 
 var serviceBusDataSender = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')

@@ -11,12 +11,6 @@ public class TodoAcceptForUpdateService
 
     public async Task Create(TodoCreateDto item)
     {
-        // var message = new 
-        // {
-        //     Operation = "Create",
-        //     Id = Guid.Empty,
-        //     Body = item
-        // };
         var response = await _httpClient.PostAsJsonAsync("", item);
         response.EnsureSuccessStatusCode();
     }

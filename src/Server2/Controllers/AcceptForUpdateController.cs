@@ -1,6 +1,3 @@
-using System.Buffers;
-using System.Text;
-using Azure.Messaging.ServiceBus;
 using Dapr;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Mvc;
@@ -39,9 +36,6 @@ public class AcceptForUpdateController : Controller
         if (context is not null)
         {
             var requestTelemetry = context.Features.Get<RequestTelemetry>();
-            requestTelemetry?.Properties.Add("BodyId", item.Id.ToString());
-            requestTelemetry?.Properties.Add("BodyTraceId", item.Traceid);
-            requestTelemetry?.Properties.Add("BodyTraceParent", item.Traceparent);
             requestTelemetry?.Properties.Add("BodyDataName", data?.Name);
         }
 

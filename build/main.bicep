@@ -40,6 +40,7 @@ module server1 'server1/server1.bicep' = {
     revisionSuffix: containerImageRevisionSuffix
     serviceBusName: environment.outputs.serviceBusName
     serviceBusCreateTodoTopicName: environment.outputs.serviceBusCreateTodoTopicName
+    daprServiceBusPubSubName: environment.outputs.daprServiceBusPubSubName
   }
 }
 

@@ -1,6 +1,4 @@
-using Server2.Todo;
-
-namespace Server2;
+namespace Server2.Todo;
 
 /*
 {
