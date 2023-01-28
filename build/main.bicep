@@ -3,8 +3,6 @@ param containerAppEnvName string = 'containerAppEnvName'
 param containerImageRevisionSuffix string
 param server1ContainerImage string
 param server2ContainerImage string
-@secure()
-param queueTriggerConnectionString string
 
 // ServiceBus
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
@@ -26,12 +24,22 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
 resource serviceBusSendUpdateRequestTopic 'Microsoft.ServiceBus/namespaces/topics@2022-01-01-preview' = {
   name: 'send-update-request'
   parent: serviceBus
+  resource queueTriggerAutorization 'authorizationRules@2022-01-01-preview' = {
+    name: 'QueueTriggerAccessKey'
+    properties: {
+      rights: [
+        'Listen'
+        'Manage'
+        'Send'
+      ]
+    }
+  }
 }
 
-// resource serviceBusSendUpdateRequestSubscription 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-01-01-preview' = {
-//   name: 'server2'
-//   parent: serviceBusSendUpdateRequestTopic
-// }
+var queueTriggerConnectionString = listKeys(
+  serviceBusSendUpdateRequestTopic::queueTriggerAutorization.id, 
+  serviceBusSendUpdateRequestTopic::queueTriggerAutorization.apiVersion
+  ).primaryConnectionString
 
 // Environment
 module environment 'environment.bicep' = {
@@ -90,17 +98,6 @@ resource serviceBusSendUpdateRequestTopicSender 'Microsoft.Authorization/roleAss
   }
   scope: serviceBusSendUpdateRequestTopic
 }
-
-// resource serviceBusSendUpdateRequestTopicReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopic')
-//   properties: {
-//     principalType: 'ServicePrincipal'
-//     // Azure Service Bus Data Receiver
-//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
-//     principalId: server2.outputs.containerAppPrincipalId
-//   }
-//   scope: serviceBusSendUpdateRequestTopic
-// }
 
 resource serviceBusSendUpdateRequestTopicReceiverOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(resourceGroup().id, server2.name, 'serviceBusSendUpdateRequestTopicOwner2')
