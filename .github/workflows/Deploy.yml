@@ -88,7 +88,7 @@ jobs:
       name: Deloy ResourceGroups
       with:
         scope: subscription
-        region: location
+        region: $${{ env.location }}
         template: ./build/environment/resourceGroups.bicep
         parameters: 'location=${{ env.location }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
         deploymentName: rg-${{ github.sha }}
