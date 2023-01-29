@@ -7,6 +7,7 @@ param environmentRgName string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
 param serviceBusCreateTodoTopicQueueTriggerAutorizationName string
+param daprServiceBusPubSubName string
 
 var appName = 'process'
 
@@ -52,6 +53,14 @@ var environmentVariables = [
   {
     name: 'tableName'
     value: storage::table.name
+  }
+  {
+    name: 'PubSubComponentName'
+    value: daprServiceBusPubSubName
+  }
+  {
+    name: 'PubSubCreateTodoTopic'
+    value: serviceBusCreateTodoTopicName
   }
 ]
 
@@ -202,6 +211,7 @@ module server2EnvironmentPermissions 'server2EnvironmentPermissions.bicep' = {
   name: 'server2EnvironmentPermissions'
   scope: resourceGroup(environmentRgName)
   params: {
+    appName: appName
     appPrincipalId: containerApp.identity.principalId
     serviceBusName: serviceBusName
     serviceBusCreateTodoTopicName: serviceBusCreateTodoTopicName

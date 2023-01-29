@@ -7,6 +7,13 @@ namespace Server2.Controllers;
 [Produces("application/json")]
 public class DaprController : Controller
 {
+    private readonly IConfiguration _configuration;
+
+    public DaprController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     [HttpGet]
     [Route("config")]
     public IActionResult Get()
@@ -26,13 +33,16 @@ public class DaprController : Controller
             {"topic":"withdraw","route":"withdraw","pubsubName":"pubsub"}
         ]
         */
+        
+        var pubSubComponentName = _configuration["PubSubComponentName"];
+        var topic = _configuration["PubSubCreateTodoTopic"];
         var subscriptions = new []
         {
             new 
             {
-                topic = "send-update-request",
+                topic = topic,
                 route = "AcceptForUpdate/AcceptForUpdate",
-                pubsubName = "servicebus-pub-sub"
+                pubsubName = pubSubComponentName
             }
         };
 

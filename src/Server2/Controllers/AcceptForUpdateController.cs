@@ -26,7 +26,6 @@ public class AcceptForUpdateController : Controller
     }
 
     [HttpPost("AcceptForUpdate")]
-    [Topic("servicebus-pub-sub", "send-update-request")]
     public async Task<IActionResult> AcceptForUpdate([FromBody] AcceptForUpdateDto item)
     {
         var data = item.Data;
