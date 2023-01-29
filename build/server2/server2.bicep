@@ -66,7 +66,7 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existin
   }
 }
 
-var scaleTriggerTopicConnectionStringName = 'scaletrigger-topic-connectionstring'
+var scaleTriggerTopicConnectionStringName = 'scale-topic-connstr'
 var scaleTriggerTopicConnectionString = listKeys(
   serviceBus::createTodoTopic::queueTriggerAutorization.id, 
   serviceBus::createTodoTopic::queueTriggerAutorization.apiVersion
