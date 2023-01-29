@@ -6,6 +6,7 @@ param revisionSuffix string
 param environmentRgName string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
+param serviceBusCreateTodoTopicQueueTriggerAutorizationName string
 
 var appName = 'process'
 
@@ -21,7 +22,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage${uniqueString(resourceGroup().id)}'
+  name: 'storage-${uniqueString(resourceGroup().id)}'
   location: location
   kind: 'StorageV2'
   sku: {
@@ -59,17 +60,8 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existin
   scope: resourceGroup(environmentRgName)
   resource createTodoTopic 'topics@2022-01-01-preview' existing = {
     name: serviceBusCreateTodoTopicName
-    resource queueTriggerAutorization 'authorizationRules@2022-01-01-preview' = {
-      name: 'QueueTriggerAccessKey'
-      
-      properties: {
-        rights: [
-          'Manage'
-        ]
-      }
-    }
-    resource subscription 'subscriptions@2022-01-01-preview' = {
-      name: appName
+    resource queueTriggerAutorization 'authorizationRules@2022-01-01-preview' existing = {
+      name: serviceBusCreateTodoTopicQueueTriggerAutorizationName
     }
   }
 }
@@ -178,7 +170,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
               type: 'azure-servicebus'
               metadata: {
                 topicName: serviceBusCreateTodoTopicName
-                subscriptionName: serviceBus::createTodoTopic::subscription.name
+                subscriptionName: appName
                 namespace: '${serviceBus.name}.servicebus.windows.net'
                 messageCount: '1'
               }
@@ -198,22 +190,21 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
 
 var storageTableDataContributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
 resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, storage.id, storage::table.id, containerApp.id, storageTableDataContributor)
+  name: guid(storage.id, storage::table.id, containerApp.id, storageTableDataContributor)
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: storageTableDataContributor
     principalId: containerApp.identity.principalId
   }
-  scope: storage
 }
 
-var serviceBusDataOwner = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '090c5cfd-751d-490a-894a-3ce6f1109419')
-resource sendCreateTodoMessage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, serviceBus::createTodoTopic.id, serviceBusDataOwner)
-  properties: {
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: serviceBusDataOwner
-    principalId: containerApp.identity.principalId
+module server2EnvironmentPermissions 'server2EnvironmentPermissions.bicep' = {
+  name: 'server2EnvironmentPermissions'
+  scope: resourceGroup(environmentRgName)
+  params: {
+    appName: appName
+    appPrincipalId: containerApp.identity.principalId
+    serviceBusName: serviceBusName
+    serviceBusCreateTodoTopicName: serviceBusCreateTodoTopicName
   }
-  scope: serviceBus::createTodoTopic
 }

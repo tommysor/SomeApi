@@ -22,7 +22,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage${uniqueString(resourceGroup().id)}'
+  name: 'storage-${uniqueString(resourceGroup().id)}'
   location: location
   kind: 'StorageV2'
   sku: {
@@ -167,18 +167,17 @@ resource tableContributer 'Microsoft.Authorization/roleAssignments@2022-04-01' =
     roleDefinitionId: storageTableDataContributor
     principalId: containerApp.identity.principalId
   }
-  scope: storage
 }
 
-var serviceBusDataSender = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')
-resource sendCreateTodoMessage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, containerApp.id, serviceBus::createTodoTopic.id, serviceBusDataSender)
-  properties: {
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: serviceBusDataSender
-    principalId: containerApp.identity.principalId
+module server1EnvironmentPermissions 'server1EnvironmentPermissions.bicep' = {
+  name: 'server1EnvironmentPermissions'
+  scope: resourceGroup(environmentRgName)
+  params: {
+    appName: appName
+    appPrincipalId: containerApp.identity.principalId
+    serviceBusName: serviceBusName
+    serviceBusCreateTodoTopicName: serviceBusCreateTodoTopicName
   }
-  scope: serviceBus::createTodoTopic
 }
 
 output ingressFqdn string = containerApp.properties.configuration.ingress.fqdn
