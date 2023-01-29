@@ -1,4 +1,3 @@
-param appName string
 param appPrincipalId string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
@@ -7,9 +6,6 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' existin
   name: serviceBusName
   resource createTodoTopic 'topics@2022-01-01-preview' existing = {
     name: serviceBusCreateTodoTopicName
-    resource subscription 'subscriptions@2022-01-01-preview' = {
-      name: appName
-    }
   }
 }
 
