@@ -34,6 +34,7 @@ module server1 'server1/server1.bicep' = {
   scope: resourceGroup(apiRgName)
   params: {
     location: location
+    environmentRgName: environmentRgName
     logAnalyticsId: environment.outputs.logAnalyticsId
     environmentId: environment.outputs.containerAppEnvironmentId
     containerImage: server1ContainerImage
@@ -49,12 +50,14 @@ module server2 'server2/server2.bicep' = {
   scope: resourceGroup(processingRgName)
   params: {
     location: location
+    environmentRgName: environmentRgName
     logAnalyticsId: environment.outputs.logAnalyticsId
     environmentId: environment.outputs.containerAppEnvironmentId
     containerImage: server2ContainerImage
     revisionSuffix: containerImageRevisionSuffix
     serviceBusName: environment.outputs.serviceBusName
     serviceBusCreateTodoTopicName: environment.outputs.serviceBusCreateTodoTopicName
+    serviceBusCreateTodoTopicQueueTriggerAutorizationName: environment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName
   }
 }
 
