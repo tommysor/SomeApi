@@ -22,7 +22,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'storage-${uniqueString(resourceGroup().id)}'
+  name: 'storage${uniqueString(resourceGroup().id)}'
   location: location
   kind: 'StorageV2'
   sku: {
