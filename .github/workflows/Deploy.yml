@@ -113,7 +113,7 @@ jobs:
         environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
         serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
         serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
-        logAnalyticsId: ${{ steps.deployEnvironment.outputs.logAnalyticsId }}
+        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
         daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
       with:
         scope: resourcegroup
@@ -121,7 +121,7 @@ jobs:
         template: ./build/server1/server1.bicep
         deploymentMode: Complete
         deploymentName: api-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} logAnalyticsId=${{ env.logAnalyticsId }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
 
     - uses: azure/arm-deploy@v1
       id: deployProcessing
@@ -133,7 +133,7 @@ jobs:
         environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
         serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
         serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
-        logAnalyticsId: ${{ steps.deployEnvironment.outputs.logAnalyticsId }}
+        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
         serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
         daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
       with:
@@ -142,4 +142,4 @@ jobs:
         template: ./build/server2/server2.bicep
         deploymentMode: Complete
         deploymentName: process-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} logAnalyticsId=${{ env.logAnalyticsId }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'

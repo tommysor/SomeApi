@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param logAnalyticsId string
+param applicationInsightsConnectionString string
 param environmentId string
 param containerImage string
 param revisionSuffix string
@@ -10,17 +10,6 @@ param serviceBusCreateTodoTopicQueueTriggerAutorizationName string
 param daprServiceBusPubSubName string
 
 var appName = 'process'
-
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${resourceGroup().name}-ai'
-  location: location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    RetentionInDays: 30
-    WorkspaceResourceId: logAnalyticsId
-  }
-}
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: 'storage${uniqueString(resourceGroup().id)}'
@@ -44,7 +33,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 var environmentVariables = [
   {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-    value: applicationInsights.properties.ConnectionString
+    value: applicationInsightsConnectionString
   }
   {
     name: 'tableEndpoint'
