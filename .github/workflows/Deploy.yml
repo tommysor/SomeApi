@@ -85,16 +85,17 @@ jobs:
 
     - uses: azure/arm-deploy@v1
       id: deployResourceGroups
+      name: Deloy ResourceGroups
       with:
         scope: subscription
         region: location
         template: ./build/environment/resourceGroups.bicep
-        parameters: 'environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
-        deploymentMode: Incremental
+        parameters: 'location=${{ env.location }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
         deploymentName: rg-${{ github.sha }}
 
     - uses: azure/arm-deploy@v1
       id: deployEnvironment
+      name: Deploy Environment
       with:
         scope: resourcegroup
         resourceGroupName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
@@ -104,6 +105,7 @@ jobs:
 
     - uses: azure/arm-deploy@v1
       id: deployApi
+      name: Deploy Api
       env:
         environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
         containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
