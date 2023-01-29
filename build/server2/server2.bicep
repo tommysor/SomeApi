@@ -1,4 +1,4 @@
-param location string
+param location string = resourceGroup().location
 param logAnalyticsId string
 param environmentId string
 param containerImage string

@@ -123,15 +123,22 @@ jobs:
         deploymentName: api-${{ github.sha }}
         parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} logAnalyticsId=${{ env.logAnalyticsId }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
 
-
-    # - uses: azure/arm-deploy@v1
-    #   env:
-    #     image_tag_server1: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
-    #     image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
-    #   with:
-    #     scope: subscription
-    #     region: 'norwayeast'
-    #     template: ./build/main.bicep
-    #     parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
-    #     deploymentMode: Complete
-    #     deploymentName: ${{ github.sha }}
+    - uses: azure/arm-deploy@v1
+      id: deployProcessing
+      name: Deploy Processing
+      env:
+        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
+        revisionSuffix: ${{ github.sha }}
+        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
+        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
+        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+        logAnalyticsId: ${{ steps.deployEnvironment.outputs.logAnalyticsId }}
+        serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ steps.deployResourceGroups.outputs.processingRgName }}
+        template: ./build/server2/server2.bicep
+        deploymentMode: Complete
+        deploymentName: process-${{ github.sha }}
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} logAnalyticsId=${{ env.logAnalyticsId }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}'
