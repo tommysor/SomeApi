@@ -19,3 +19,7 @@ resource processing 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   location: location
   name: processingRgName
 }
+
+output environmentRgName string = environment.name
+output apiRgName string = api.name
+output processingRgName string = processing.name

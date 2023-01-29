@@ -68,6 +68,9 @@ jobs:
     - buildServer2
     environment: Production
 
+    env:
+      location: 'norwayeast'
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -81,13 +84,52 @@ jobs:
         creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
     - uses: azure/arm-deploy@v1
-      env:
-        image_tag_server1: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
-        image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
+      id: deployResourceGroups
       with:
         scope: subscription
-        region: 'norwayeast'
-        template: ./build/main.bicep
-        parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
+        region: location
+        template: ./build/environment/resourceGroups.bicep
+        parameters: 'environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
+        deploymentMode: Incremental
+        deploymentName: rg-${{ github.sha }}
+
+    - uses: azure/arm-deploy@v1
+      id: deployEnvironment
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
+        template: ./build/environment/environment.bicep
         deploymentMode: Complete
-        deploymentName: ${{ github.sha }}
+        deploymentName: env-${{ github.sha }}
+
+    - uses: azure/arm-deploy@v1
+      id: deployApi
+      env:
+        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
+        revisionSuffix: ${{ github.sha }}
+        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
+        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
+        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+        logAnalyticsId: ${{ steps.deployEnvironment.outputs.logAnalyticsId }}
+        daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ steps.deployResourceGroups.outputs.apiRgName }}
+        template: ./build/server1/server1.bicep
+        deploymentMode: Complete
+        deploymentName: api-${{ github.sha }}
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} logAnalyticsId=${{ env.logAnalyticsId }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+
+
+    # - uses: azure/arm-deploy@v1
+    #   env:
+    #     image_tag_server1: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
+    #     image_tag_server2: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
+    #   with:
+    #     scope: subscription
+    #     region: 'norwayeast'
+    #     template: ./build/main.bicep
+    #     parameters: 'containerImageRevisionSuffix=${{ github.sha }} server1ContainerImage=${{ env.image_tag_server1 }} server2ContainerImage=${{ env.image_tag_server2 }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} apiRgName=${{ secrets.AZURE_API_RG }} processingRgName=${{ secrets.AZURE_PROCESSING_RG }}'
+    #     deploymentMode: Complete
+    #     deploymentName: ${{ github.sha }}
