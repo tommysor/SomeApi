@@ -202,7 +202,6 @@ module server2EnvironmentPermissions 'server2EnvironmentPermissions.bicep' = {
   name: 'server2EnvironmentPermissions'
   scope: resourceGroup(environmentRgName)
   params: {
-    appName: appName
     appPrincipalId: containerApp.identity.principalId
     serviceBusName: serviceBusName
     serviceBusCreateTodoTopicName: serviceBusCreateTodoTopicName

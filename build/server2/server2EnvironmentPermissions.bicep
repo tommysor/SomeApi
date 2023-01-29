@@ -1,4 +1,3 @@
-param appName string
 param appPrincipalId string
 param serviceBusName string
 param serviceBusCreateTodoTopicName string
