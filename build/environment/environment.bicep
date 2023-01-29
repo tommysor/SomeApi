@@ -47,6 +47,8 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
       properties: {
         rights: [
           'Manage'
+          'Listen'
+          'Send'
         ]
       }
     }
