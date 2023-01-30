@@ -63,9 +63,6 @@ jobs:
 
   deployEnvironment:
     runs-on: ubuntu-22.04
-    needs:
-    - buildApi
-    - buildProcessor
     environment: Production
     env:
       location: 'norwayeast'
@@ -111,7 +108,9 @@ jobs:
 
   deployApi:
     runs-on: ubuntu-22.04
-    needs: deployEnvironment
+    needs:
+    - deployEnvironment
+    - buildApi
     environment: Production
     env:
       location: 'norwayeast'
@@ -149,7 +148,9 @@ jobs:
 
   deployProcessor:
     runs-on: ubuntu-22.04
-    needs: deployEnvironment
+    needs:
+    - deployEnvironment
+    - buildProcessor
     environment: Production
     env:
       location: 'norwayeast'
