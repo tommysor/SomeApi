@@ -11,11 +11,13 @@ public class AcceptForUpdateController : Controller
 {
     private readonly ILogger<AcceptForUpdateController> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly SaveChangeService _saveChangeService;
 
-    public AcceptForUpdateController(ILogger<AcceptForUpdateController> logger, IHttpContextAccessor httpContextAccessor)
+    public AcceptForUpdateController(ILogger<AcceptForUpdateController> logger, IHttpContextAccessor httpContextAccessor, SaveChangeService saveChangeService)
     {
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
+        _saveChangeService = saveChangeService;
     }
 
     [HttpGet]
@@ -25,19 +27,21 @@ public class AcceptForUpdateController : Controller
     }
 
     [HttpPost("AcceptForUpdate")]
-    public async Task<IActionResult> AcceptForUpdate([FromBody] AcceptForUpdateDto item)
+    public async Task<IActionResult> AcceptForUpdate([FromBody] AcceptForUpdateDto item, CancellationToken cancellationToken)
     {
         var data = item.Data;
-        _logger.LogInformation("AcceptForUpdate: {item}", data?.Name);
+        if (data is null)
+            return BadRequest(new { ErrorMessage = "Data is null"});
+        _logger.LogInformation("AcceptForUpdate: {item}", data.Name);
 
         var context = _httpContextAccessor.HttpContext;
         if (context is not null)
         {
             var requestTelemetry = context.Features.Get<RequestTelemetry>();
-            requestTelemetry?.Properties.Add("BodyDataName", data?.Name);
+            requestTelemetry?.Properties.Add("BodyDataName", data.Name);
         }
 
-        await Task.CompletedTask;
+        await _saveChangeService.Create(data, cancellationToken);
         return Accepted();
     }
 }
