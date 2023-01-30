@@ -140,7 +140,7 @@ jobs:
         daprServiceBusPubSubName: ${{ needs.deployEnvironment.outputs.daprServiceBusPubSubName }}
       with:
         scope: resourcegroup
-        resourceGroupName: ${{ steps.deployResourceGroups.outputs.apiRgName }}
+        resourceGroupName: ${{ secrets.AZURE_API_RG }}
         template: ./build/server1/server1.bicep
         deploymentMode: Complete
         deploymentName: api-${{ github.sha }}
@@ -181,7 +181,7 @@ jobs:
         serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ needs.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
       with:
         scope: resourcegroup
-        resourceGroupName: ${{ steps.deployResourceGroups.outputs.processingRgName }}
+        resourceGroupName: ${{ secrets.AZURE_PROCESSING_RG }}
         template: ./build/server2/server2.bicep
         deploymentMode: Complete
         deploymentName: process-${{ github.sha }}
