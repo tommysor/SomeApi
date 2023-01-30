@@ -26,6 +26,7 @@ builder.Services.AddTransient<TableClient>(services =>
     logger.LogInformation("Table endpoint: {tableEndpoint} name: {tableName}", tableEndpoint, tableName);
 
     var tableClient = new TableClient(new Uri(tableEndpoint), tableName, new DefaultAzureCredential());
+    tableClient.CreateIfNotExists();
     return tableClient;
 });
 
