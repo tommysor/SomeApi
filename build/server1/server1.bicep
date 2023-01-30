@@ -41,6 +41,10 @@ var createTodoPublishUrl = 'http://localhost:3500/v1.0/publish/${daprServiceBusP
 
 var environmentVariables = [
   {
+    name: 'appName'
+    value: appName
+  }
+  {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
     value: applicationInsightsConnectionString
   }

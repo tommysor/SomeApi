@@ -17,7 +17,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks()
     .AddCheck("Hello", () => HealthCheckResult.Healthy("World"));
 
-builder.Services.AddSingleton<ITelemetryInitializer>(new Server1TelemetryInitializer("Server1"));
+var appName = builder.Configuration["appName"] ?? nameof(Server1);
+builder.Services.AddSingleton<ITelemetryInitializer>(new Server1TelemetryInitializer(appName));
 builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddTransient<TodoAcceptForUpdateService>();
@@ -38,8 +39,7 @@ builder.Services.AddTransient<TableClient>(services =>
     var tableEndpoint = configuration["tableEndpoint"]!;
     var tableName = configuration["tableName"]!;
     var logger = services.GetRequiredService<ILogger<TableClient>>();
-    logger.LogInformation("Table endpoint: {tableEndpoint}", tableEndpoint);
-    logger.LogInformation("Table name: {tableName}", tableName);
+    logger.LogInformation("Table endpoint: {tableEndpoint} name: {tableName}", tableEndpoint, tableName);
 
     var tableClient = new TableClient(new Uri(tableEndpoint), tableName, new DefaultAzureCredential());
     return tableClient;

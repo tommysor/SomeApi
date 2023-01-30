@@ -32,6 +32,10 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
 var environmentVariables = [
   {
+    name: 'appName'
+    value: appName
+  }
+  {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
     value: applicationInsightsConnectionString
   }

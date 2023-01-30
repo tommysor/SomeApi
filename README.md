@@ -5,8 +5,8 @@
 `secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS` should contain the output from:
 
 ```bash
-# Scope / ResourceGroupId can be found by opening ResourceGroup in portal and opening "JSON View"
-scope=/subscriptions/<subcriptionId>/resourceGroups/<resourceGroupName>
+# Scope to Management group
+scope=xxx
 
 # Create (or patch) service principal
 az ad sp create-for-rbac --name "someapi-deployer" --role contributor \
