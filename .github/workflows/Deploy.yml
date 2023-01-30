@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  buildServer1:
+  buildApi:
     runs-on: ubuntu-22.04
 
     steps:
@@ -37,7 +37,7 @@ jobs:
           docker build --tag ${{ env.image_tag_server1 }} ./src/Server1
           docker push ${{ env.image_tag_server1 }}
 
-  buildServer2:
+  buildProcessor:
     runs-on: ubuntu-22.04
 
     steps:
@@ -64,8 +64,8 @@ jobs:
   deploy:
     runs-on: ubuntu-22.04
     needs:
-    - buildServer1
-    - buildServer2
+    - buildApi
+    - buildProcessor
     environment: Production
 
     env:
@@ -104,26 +104,6 @@ jobs:
         deploymentName: env-${{ github.sha }}
 
     - uses: azure/arm-deploy@v1
-      id: deployApi
-      name: Deploy Api
-      env:
-        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
-        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
-        revisionSuffix: ${{ github.sha }}
-        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
-        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
-        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
-        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
-        daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
-      with:
-        scope: resourcegroup
-        resourceGroupName: ${{ steps.deployResourceGroups.outputs.apiRgName }}
-        template: ./build/server1/server1.bicep
-        deploymentMode: Complete
-        deploymentName: api-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
-
-    - uses: azure/arm-deploy@v1
       id: deployProcessing
       name: Deploy Processing
       env:
@@ -143,3 +123,23 @@ jobs:
         deploymentMode: Complete
         deploymentName: process-${{ github.sha }}
         parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+
+    - uses: azure/arm-deploy@v1
+      id: deployApi
+      name: Deploy Api
+      env:
+        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
+        revisionSuffix: ${{ github.sha }}
+        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
+        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
+        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
+        daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ steps.deployResourceGroups.outputs.apiRgName }}
+        template: ./build/server1/server1.bicep
+        deploymentMode: Complete
+        deploymentName: api-${{ github.sha }}
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
