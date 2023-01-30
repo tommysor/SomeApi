@@ -3,6 +3,7 @@ using Azure.Identity;
 using Microsoft.ApplicationInsights.Extensibility;
 using Server2;
 using Server2.Notifiers;
+using Server2.Todo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,8 @@ builder.Services.AddTransient<TableClient>(services =>
 });
 
 builder.Services.AddHostedService<NotifyCreatedService>();
+
+builder.Services.AddTransient<SaveChangeService>();
 
 var app = builder.Build();
 

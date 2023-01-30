@@ -61,15 +61,21 @@ jobs:
           docker build --tag ${{ env.image_tag_server2 }} ./src/Server2
           docker push ${{ env.image_tag_server2 }}
 
-  deploy:
+  deployEnvironment:
     runs-on: ubuntu-22.04
     needs:
     - buildApi
     - buildProcessor
     environment: Production
-
     env:
       location: 'norwayeast'
+    outputs:
+      containerAppEnvironmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+      serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
+      serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+      applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
+      daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
+      serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
 
     steps:
     - uses: actions/checkout@v3
@@ -103,43 +109,79 @@ jobs:
         deploymentMode: Complete
         deploymentName: env-${{ github.sha }}
 
-    - uses: azure/arm-deploy@v1
-      id: deployProcessing
-      name: Deploy Processing
-      env:
-        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
-        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
-        revisionSuffix: ${{ github.sha }}
-        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
-        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
-        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
-        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
-        serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
-        daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
+  deployApi:
+    runs-on: ubuntu-22.04
+    needs: deployEnvironment
+    environment: Production
+    env:
+      location: 'norwayeast'
+
+    steps:
+    - uses: actions/checkout@v3
       with:
-        scope: resourcegroup
-        resourceGroupName: ${{ steps.deployResourceGroups.outputs.processingRgName }}
-        template: ./build/server2/server2.bicep
-        deploymentMode: Complete
-        deploymentName: process-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        fetch-depth: 1
+
+    - name: Repo to lowercase
+      run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
 
     - uses: azure/arm-deploy@v1
       id: deployApi
       name: Deploy Api
       env:
-        environmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+        environmentId: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentId }}
         containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
         revisionSuffix: ${{ github.sha }}
-        environmentRgName: ${{ steps.deployResourceGroups.outputs.environmentRgName }}
-        serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
-        serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
-        applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
-        daprServiceBusPubSubName: ${{ steps.deployEnvironment.outputs.daprServiceBusPubSubName }}
+        serviceBusName: ${{ needs.deployEnvironment.outputs.serviceBusName }}
+        serviceBusCreateTodoTopicName: ${{ needs.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+        applicationInsightsConnectionString: ${{ needs.deployEnvironment.outputs.applicationInsightsConnectionString }}
+        daprServiceBusPubSubName: ${{ needs.deployEnvironment.outputs.daprServiceBusPubSubName }}
       with:
         scope: resourcegroup
         resourceGroupName: ${{ steps.deployResourceGroups.outputs.apiRgName }}
         template: ./build/server1/server1.bicep
         deploymentMode: Complete
         deploymentName: api-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ env.environmentRgName }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+
+  deployProcessor:
+    runs-on: ubuntu-22.04
+    needs: deployEnvironment
+    environment: Production
+    env:
+      location: 'norwayeast'
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+
+    - name: Repo to lowercase
+      run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
+
+    - uses: azure/arm-deploy@v1
+      id: deployProcessing
+      name: Deploy Processing
+      env:
+        environmentId: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
+        revisionSuffix: ${{ github.sha }}
+        serviceBusName: ${{ needs.deployEnvironment.outputs.serviceBusName }}
+        serviceBusCreateTodoTopicName: ${{ needs.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
+        applicationInsightsConnectionString: ${{ needs.deployEnvironment.outputs.applicationInsightsConnectionString }}
+        daprServiceBusPubSubName: ${{ needs.deployEnvironment.outputs.daprServiceBusPubSubName }}
+        serviceBusCreateTodoTopicQueueTriggerAutorizationName: ${{ needs.deployEnvironment.outputs.serviceBusCreateTodoTopicQueueTriggerAutorizationName }}
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ steps.deployResourceGroups.outputs.processingRgName }}
+        template: ./build/server2/server2.bicep
+        deploymentMode: Complete
+        deploymentName: process-${{ github.sha }}
+        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'

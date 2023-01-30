@@ -32,7 +32,7 @@ namespace Server2.Todo
             };
             var addNotifyCreatedAction = new TableTransactionAction(TableTransactionActionType.Add, notify);
 
-            var actions = new [] {addAction, addNotifyCreatedAction};
+            var actions = new [] { addAction, addNotifyCreatedAction };
             
             await _tableClient.SubmitTransactionAsync(actions, cancellationToken);
         }
