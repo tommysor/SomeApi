@@ -86,7 +86,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
   }
 }
 
-output containerAppEnvironmentId string = containerAppEnv.id
+output containerAppEnvironmentName string = containerAppEnv.name
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
 output serviceBusName string = serviceBus.name
 output serviceBusCreateTodoTopicName string = serviceBus::createTodoTopic.name

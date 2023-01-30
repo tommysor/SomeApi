@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param environmentId string
+param containerAppEnvironmentName string
 param containerImage string
 param revisionSuffix string
 param environmentRgName string
@@ -62,6 +62,11 @@ var environmentVariables = [
   }
 ]
 
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-06-01-preview' existing = {
+  name: containerAppEnvironmentName
+  scope: resourceGroup(environmentRgName)
+}
+
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: appName
   location: location
@@ -69,7 +74,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
     type: 'SystemAssigned'
   }  
   properties: {
-    environmentId: environmentId
+    environmentId: containerAppEnvironment.id
     configuration: {
       ingress: {
         external: true

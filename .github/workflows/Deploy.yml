@@ -131,7 +131,7 @@ jobs:
       id: deployApi
       name: Deploy Api
       env:
-        environmentId: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerAppEnvironmentName: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentName }}
         containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server1:${{ github.sha }}
         revisionSuffix: ${{ github.sha }}
         serviceBusName: ${{ needs.deployEnvironment.outputs.serviceBusName }}
@@ -144,7 +144,7 @@ jobs:
         template: ./build/server1/server1.bicep
         deploymentMode: Complete
         deploymentName: api-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        parameters: 'containerAppEnvironmentName=${{ env.containerAppEnvironmentName }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
 
   deployProcessor:
     runs-on: ubuntu-22.04
@@ -171,7 +171,7 @@ jobs:
       id: deployProcessing
       name: Deploy Processing
       env:
-        environmentId: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentId }}
+        containerAppEnvironmentName: ${{ needs.deployEnvironment.outputs.containerAppEnvironmentName }}
         containerImage: ghcr.io/${{ env.GITHUB_REPOSITORY_LOWERCASE }}/server2:${{ github.sha }}
         revisionSuffix: ${{ github.sha }}
         serviceBusName: ${{ needs.deployEnvironment.outputs.serviceBusName }}
@@ -185,4 +185,4 @@ jobs:
         template: ./build/server2/server2.bicep
         deploymentMode: Complete
         deploymentName: process-${{ github.sha }}
-        parameters: 'environmentId=${{ env.environmentId }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
+        parameters: 'containerAppEnvironmentName=${{ env.containerAppEnvironmentName }} containerImage=${{ env.containerImage }} revisionSuffix=${{ env.revisionSuffix }} environmentRgName=${{ secrets.AZURE_ENVIRONMENT_RG }} serviceBusName=${{ env.serviceBusName }} serviceBusCreateTodoTopicName=${{ env.serviceBusCreateTodoTopicName }} applicationInsightsConnectionString=${{ env.applicationInsightsConnectionString }} serviceBusCreateTodoTopicQueueTriggerAutorizationName=${{ env.serviceBusCreateTodoTopicQueueTriggerAutorizationName }} daprServiceBusPubSubName=${{ env.daprServiceBusPubSubName }}'
