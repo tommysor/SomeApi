@@ -32,9 +32,12 @@ namespace Server2.Todo
             };
             var addNotifyCreatedAction = new TableTransactionAction(TableTransactionActionType.Add, notify);
 
-            var actions = new [] { addAction, addNotifyCreatedAction };
-            
-            await _tableClient.SubmitTransactionAsync(actions, cancellationToken);
+            // odata.error":{"code":"CommandsInBatchActOnDifferentPartitions"
+            // var actions = new [] { addAction, addNotifyCreatedAction };
+            // await _tableClient.SubmitTransactionAsync(actions, cancellationToken);
+
+            await _tableClient.AddEntityAsync(todo, cancellationToken);
+            await _tableClient.AddEntityAsync(notify, cancellationToken);
         }
     }
 }
