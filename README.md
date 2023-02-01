@@ -6,7 +6,7 @@
 
 ```bash
 # Scope to Management group
-scope=xxxx
+scope=xxxxx
 
 # Create (or patch) service principal
 az ad sp create-for-rbac --name "someapi-deployer" --role contributor \
