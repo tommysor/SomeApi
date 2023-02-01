@@ -35,11 +35,7 @@ namespace Server2.Notifiers
                             };
 
                             //todo publish to xxx
-                            _logger.LogInformation("Publishing change: {Todo}", todo);
-
-                            _logger.LogInformation("Publishing change: {Id}", todo.Id);
-                            _logger.LogInformation("Publishing change: {Name}", todo.Name);
-                            _logger.LogInformation("Publishing change: {IsCompleted}", todo.IsComplete);
+                            _logger.LogInformation("Publishing change: {Id}, {Name}, {IsCompleted}", todo.Id, todo.Name, todo.IsComplete);
 
                             var deleteAction = new TableTransactionAction(TableTransactionActionType.Delete, item);
                             await _tableClient.DeleteEntityAsync(item.PartitionKey, item.RowKey, item.ETag, stoppingToken);
