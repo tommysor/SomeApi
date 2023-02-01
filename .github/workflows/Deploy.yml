@@ -67,7 +67,7 @@ jobs:
     env:
       location: 'norwayeast'
     outputs:
-      containerAppEnvironmentId: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentId }}
+      containerAppEnvironmentName: ${{ steps.deployEnvironment.outputs.containerAppEnvironmentName }}
       serviceBusName: ${{ steps.deployEnvironment.outputs.serviceBusName }}
       serviceBusCreateTodoTopicName: ${{ steps.deployEnvironment.outputs.serviceBusCreateTodoTopicName }}
       applicationInsightsConnectionString: ${{ steps.deployEnvironment.outputs.applicationInsightsConnectionString }}
