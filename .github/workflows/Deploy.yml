@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  packages: none
+  id-token: none
 
 jobs:
   buildApi:
