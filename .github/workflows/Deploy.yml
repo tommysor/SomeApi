@@ -18,6 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - name: Repo to lowercase
         run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
@@ -42,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - name: Repo to lowercase
         run: echo "GITHUB_REPOSITORY_LOWERCASE=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
@@ -112,8 +116,6 @@ jobs:
     - deployEnvironment
     - buildApi
     environment: Production
-    env:
-      location: 'norwayeast'
 
     steps:
     - uses: actions/checkout@v3
@@ -152,8 +154,6 @@ jobs:
     - deployEnvironment
     - buildProcessor
     environment: Production
-    env:
-      location: 'norwayeast'
 
     steps:
     - uses: actions/checkout@v3
