@@ -1,0 +1,52 @@
+name: pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  id-token: none
+
+jobs:
+  buildTestProcessor:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      
+      - name: Setup .NET 7
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Build
+        run: |
+          dotnet build ./src/Server2/Server2.csproj
+
+      - name: Test
+        run: |
+          dotnet test ./src/Server2.Tests.System/Server2.Tests.System.csproj
+
+  buildTestApi:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      
+      - name: Setup .NET 7
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Build
+        run: |
+          dotnet build ./src/Server1/Server1.csproj
