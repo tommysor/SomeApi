@@ -88,7 +88,9 @@ jobs:
 
     - uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
+        client-id: ${{ Secrets.AZURE_CLIENT_ID }}
+        subscription-id: ${{ Secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ Secrets.AZURE_TENANT_ID }}
 
     - uses: azure/arm-deploy@v1
       id: deployResourceGroups
@@ -127,7 +129,9 @@ jobs:
 
     - uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
+        client-id: ${{ Secrets.AZURE_CLIENT_ID }}
+        subscription-id: ${{ Secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ Secrets.AZURE_TENANT_ID }}
 
     - uses: azure/arm-deploy@v1
       id: deployApi
@@ -165,7 +169,9 @@ jobs:
 
     - uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_SOMEAPI_DEPLOYER_CREDENTIALS }}
+        client-id: ${{ Secrets.AZURE_CLIENT_ID }}
+        subscription-id: ${{ Secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ Secrets.AZURE_TENANT_ID }}
 
     - uses: azure/arm-deploy@v1
       id: deployProcessing
