@@ -13,11 +13,12 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
 
 jobs:
   buildApi:
     runs-on: ubuntu-22.04
+    # permissions:
+    #   packages: write
 
     steps:
       - uses: actions/checkout@v3
@@ -44,6 +45,8 @@ jobs:
 
   buildProcessor:
     runs-on: ubuntu-22.04
+    permissions:
+      packages: write
 
     steps:
       - uses: actions/checkout@v3
@@ -71,6 +74,8 @@ jobs:
   deployEnvironment:
     runs-on: ubuntu-22.04
     environment: Production
+    permissions:
+      id-token: write
     env:
       location: 'norwayeast'
     outputs:
@@ -121,6 +126,8 @@ jobs:
     - deployEnvironment
     - buildApi
     environment: Production
+    permissions:
+      id-token: write
 
     steps:
     - uses: actions/checkout@v3
@@ -161,6 +168,8 @@ jobs:
     - deployEnvironment
     - buildProcessor
     environment: Production
+    permissions:
+      id-token: write
 
     steps:
     - uses: actions/checkout@v3
